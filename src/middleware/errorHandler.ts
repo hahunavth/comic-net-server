@@ -1,5 +1,11 @@
+import { NextFunction, Request, Response } from "express";
+
 class RequestError extends Error {
-  constructor(code, devMessage, userMessage = "Lỗi server, vui lòng thử lại!") {
+
+  code
+  userMessage
+
+  constructor(code: any, devMessage: any, userMessage = "Lỗi server, vui lòng thử lại!") {
     super(devMessage);
 
     this.code = code;
@@ -7,7 +13,7 @@ class RequestError extends Error {
   }
 }
 
-const errorHandler = (err, _req, res, _next) => {
+const errorHandler = (err: Error, _req: Request, res: Response, _next: NextFunction) => {
   console.error(err);
 
   if (err instanceof RequestError) {

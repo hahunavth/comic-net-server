@@ -13,8 +13,6 @@ import { checkDotEnv } from "./src/utils/index.js";
 
 // import "./src/routes/books.js";
 
-checkDotEnv();
-
 const app = express();
 // const PORT = process.env.PORT || 8000;
 console.log("🚀 ~ file: index.js ~ line 17 ~ PORT", PORT);
@@ -66,7 +64,8 @@ app.use(
 app.get("/", (req, res) =>
   res.status(200).json({
     success: true,
-    message: "Server running in: " + SERVER_URL,
+    message: "Server running in: " + SERVER_URL ,
+    info: "You can test api at " + `http://localhost:8000/docs`
   })
 );
 

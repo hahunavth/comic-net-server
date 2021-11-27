@@ -1,5 +1,7 @@
 import corsAnyware from "cors-anywhere";
+// declare module 'cors-anywhere'
 import axios from "axios";
+import {Request, Response, NextFunction} from 'express'
 
 import Model from "../models/index.js";
 
@@ -10,7 +12,7 @@ const proxy = corsAnyware.createServer({
 });
 
 class Controller {
-  static async test(req, res, next) {
+  static async test(req: Request, res: Response, next: NextFunction) {
     try {
       const { data } = await axios.get("http://www.nettruyenpro.com/");
       res.status(200).json({ message: "sucessfully!", data });
@@ -20,11 +22,11 @@ class Controller {
     }
   }
 
-  static async getRecentUpdated(req, res, next) {
+  static async getRecentUpdated(req: Request, res: Response, next: NextFunction) {
     try {
       const { pagination, page, limit, offset } = res.locals;
 
-      const list = await Model.RecentUpdate(page, limit);
+      const list = await Model.RecentUpdate(page);
 
       console.log(list?.length);
       res.status(200).json(list);
@@ -33,12 +35,12 @@ class Controller {
     }
   }
 
-  static async getHotPage(req, res, next) {
+  static async getHotPage(req: Request, res: Response, next: NextFunction) {
     try {
       const { _page } = req.query;
       // const { offset } = pageToPagination(_page);
 
-      const list = (await Model.getHotPage(_page))[0];
+      const list = (await Model.getHotPage())[0];
 
       console.log(list.length);
       res.status(200).json(list);
@@ -47,11 +49,11 @@ class Controller {
     }
   }
 
-  static async getComicPage(req, res, next) {
+  static async getComicPage(req: Request, res: Response, next: NextFunction) {
     try {
       // console.log("aaaaaaa");
       // if (req.body) return res.status(400).json({});
-      let path = req.body?.path || req.params.id;
+      const path = req.body?.path || req.params.id;
       console.log(path);
       const result = await Model.getComicPage(
         path
@@ -64,7 +66,7 @@ class Controller {
     }
   }
 
-  static async findComicPage(req, res, next) {
+  static async findComicPage(req: Request, res: Response, next: NextFunction) {
     try {
       const { genres, minchapter, status } = req.query;
       const statusList = [
@@ -72,7 +74,6 @@ class Controller {
         { name: "da hoan thanh", id: 2 },
         { name: "Tat ca", id: -1 },
       ];
-      console.log(genresIds);
       const result = await Model.FindComic();
       return res.status(200).json(result[0]);
     } catch (error) {
@@ -80,7 +81,7 @@ class Controller {
     }
   }
 
-  static async getChapterPage(req, res, next) {
+  static async getChapterPage(req: Request, res: Response, next: NextFunction) {
     try {
       // console.log(req.path);
       const data = await Model.getChapterPage(req.path);
@@ -90,7 +91,7 @@ class Controller {
     }
   }
 
-  static async corsAnywhere(req, res) {
+  static async corsAnywhere(req: Request, res: Response) {
     req.url = req.url.replace("/cors/", "/");
     console.log(req.body);
     proxy.emit("request", req, res);

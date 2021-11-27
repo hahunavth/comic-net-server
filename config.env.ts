@@ -1,6 +1,6 @@
-import dotenv from "dotenv";
-
-dotenv.config();
+import 'dotenv/config'
+// import dotenv from "dotenv";
+// dotenv.config();
 
 export const API_URL = process.env.API_URL || "http://www.nettruyenpro.com/";
 export const PORT = process.env.PORT || 8000;
