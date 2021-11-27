@@ -1,20 +1,21 @@
 import axios from "axios";
-import dotenv from "dotenv";
+// import dotenv from "dotenv";
 import { JSDOM } from "jsdom";
 import path from "path";
-import {GENRES_LIST} from '../../constants.js';
+import { GENRES_LIST } from "../../constants.js";
+import { API_URL } from "../../config.env.js";
 
 //  CONFIG
-dotenv.config({
-  // for commonjs use __dirname, "../.env"
-  path: path.resolve(new URL("../../.env", import.meta.url).pathname),
-});
+// dotenv.config({
+//   // for commonjs use __dirname, "../.env"
+//   path: path.resolve(new URL("../../.env", import.meta.url).pathname),
+// });
 
 const instance = axios.create({
-  baseURL: process.env.API_URL ,
+  baseURL: API_URL,
   headers: {
     // "X-Requested-With": "XMLHttpRequest",
-    Referer: process.env.API_URL,
+    Referer: API_URL,
   },
 });
 
@@ -22,7 +23,7 @@ const instance = axios.create({
 class Model {
   static async getLogoUrl() {
     try {
-      const { data } = await instance.get(process.env.API_URL);
+      const { data } = await instance.get(API_URL);
       const imageUrls = parseListGen(
         data,
         [{ selectorAll: ".logo > img", query: "src" }],
@@ -104,7 +105,6 @@ class Model {
 
   static async FindComic() {
     try {
-
       function toIdList(ids) {
         return ids.reduce((prev, id) => prev + id, "");
       }
@@ -226,7 +226,7 @@ async function getComicCard(data) {
           result.path = e
             .querySelector("a")
             .getAttribute("href")
-            .replace(process.env.API_URL, "");
+            .replace(API_URL, "");
           result.id = result.path;
 
           let e2 = e.querySelectorAll(".item > figure > figcaption > ul > li");
@@ -271,7 +271,7 @@ function handleUrl(element, attribute) {
     .getAttribute(attribute)
     .replace("http://www.nettruyenpro.com", "");
 }
- 
+
 /*
   Parameter:
     html: html string

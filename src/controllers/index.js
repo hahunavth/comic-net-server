@@ -92,6 +92,7 @@ class Controller {
 
   static async corsAnywhere(req, res) {
     req.url = req.url.replace("/cors/", "/");
+    console.log(req.body);
     proxy.emit("request", req, res);
   }
 }
