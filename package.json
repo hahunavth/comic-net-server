@@ -1,0 +1,28 @@
+{
+  "name": "comic-cors-api",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "hahunavth",
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "axios": "^0.24.0",
+    "body-parser": "^1.19.0",
+    "cheerio": "^1.0.0-rc.10",
+    "cors": "^2.8.5",
+    "cors-anywhere": "^0.4.4",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "jsdom": "^18.1.0",
+    "memory-cache": "^0.2.0",
+    "morgan": "^1.10.0",
+    "swagger-jsdoc": "^6.1.0",
+    "swagger-ui-express": "^4.1.6"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  },
+  "scripts": {
+    "dev": "nodemon index.js"
+  }
+}
