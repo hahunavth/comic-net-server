@@ -3,6 +3,6 @@ import 'dotenv/config'
 // dotenv.config();
 
 export const API_URL = process.env.API_URL || "http://www.nettruyenpro.com/";
-export const PORT = process.env.PORT || 8000;
+export const PORT = process.env.PORT || 3000;
 export const SERVER_URL =
-  process.env.SERVER_URL || "http://localhost:8000/api/v1";
+  process.env.SERVER_URL || "http://localhost:3000/api/v1";
