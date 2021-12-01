@@ -15,7 +15,7 @@ import { checkDotEnv } from "./src/utils/index.js";
 
 const app = express();
 // const PORT = process.env.PORT || 8000;
-console.log("🚀 ~ file: index.js ~ line 17 ~ PORT", PORT);
+// console.log("🚀 ~ file: index.js ~ line 17 ~ PORT", PORT);
 
 app.use(cors());
 app.use(cache());

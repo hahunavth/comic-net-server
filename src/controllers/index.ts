@@ -1,3 +1,4 @@
+// @ts-ignore
 import corsAnyware from "cors-anywhere";
 // declare module 'cors-anywhere'
 import axios from "axios";

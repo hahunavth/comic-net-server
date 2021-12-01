@@ -17,7 +17,8 @@
     "memory-cache": "^0.2.0",
     "morgan": "^1.10.0",
     "swagger-jsdoc": "^6.1.0",
-    "swagger-ui-express": "^4.1.6"
+    "swagger-ui-express": "^4.1.6",
+    "ts-node-dev": "^1.1.8"
   },
   "devDependencies": {
     "@types/axios": "^0.14.0",
@@ -39,7 +40,7 @@
     "postinstall": "tsc",
     "watch-node": "nodemon dist/index.js",
     "watch-ts": "tsc -w",
-    "deploy": "git add . && git commit -m Heroku && git push heroku master"
-  },
-  "engines": { "node": "16.13.0" }
+    "deploy": "git add . && git commit -m Heroku && git push heroku master",
+    "dev": "node --loader ts-node/esm index.ts"
+  }
 }
