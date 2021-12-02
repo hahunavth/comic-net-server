@@ -41,6 +41,6 @@
     "watch-node": "nodemon dist/index.js",
     "watch-ts": "tsc -w",
     "deploy": "git add . && git commit -m Heroku && git push heroku master",
-    "dev": "node --loader ts-node/esm index.ts"
+    "dev": "nodemon --watch './**/*.ts' --exec 'node --loader ts-node/esm ' index.ts "
   }
 }

@@ -18,7 +18,7 @@ const app = express();
 // console.log("🚀 ~ file: index.js ~ line 17 ~ PORT", PORT);
 
 app.use(cors());
-app.use(cache());
+// app.use(cache());
 app.use(logger("dev"));
 app.use(errorHandler);
 app.use(bodyParser.json());

@@ -6,6 +6,9 @@ import path from "path";
 import { GENRES_LIST } from "../../constants.js";
 import { API_URL } from "../../config.env.js";
 
+import {readFileSync, write, writeFileSync} from 'fs'
+
+
 //  CONFIG
 // dotenv.config({
 //   // for commonjs use __dirname, "../.env"
@@ -38,8 +41,13 @@ class Model {
 
   static async RecentUpdate(page: number) {
     const { data } = await instance.get(`/?page=${page || 1}`);
+    writeFileSync("../../test.html", data)
     const result = await getComicCard(data);
+    const res2 = await getTopList(data);
+    const res3 = await getNewComment(data);
     return result && result[0];
+    // return res2 && res2[0]
+    // return res3 && res3[0];
   }
 
   static async getHotPage() {
@@ -170,9 +178,48 @@ class Model {
   }
 }
 
+Model.RecentUpdate(1).then(data => console.log(data))
 // --------------------------------------------------------------
 // --------------------------------------------------------------
 // --------------------------------------------------------------
+
+async function getNewComment(data: string) {
+
+  const list = parseListGen( data, [
+    {selectorAll: '.box > .scroll-y > ul > li', attribute: ''}
+  ] , (e: HTMLElement) => {
+    return {
+      name: e.querySelector('h3 > a')?.textContent,
+      path: e.querySelector('h3 > a')?.getAttribute('href'),
+      authorName: e.querySelector('a > span')?.textContent,
+      date: e.querySelector('abbr')?.getAttribute('title'),
+      time: e.querySelector('abbr')?.textContent,
+      content: e.querySelector('p')?.textContent,
+
+    }
+  });
+
+  return list
+}
+
+async function getTopList (data: string) {
+  const list = await parseListGen(data, [
+  {selectorAll: '#topMonth > ul > li', attribute: '', callback: (e: string) =>   e}
+  ], (e: HTMLElement) => {
+    return {
+      top: e.querySelector('span')?.textContent,
+      posterUrl: e.querySelector('div > a > img')?.getAttribute('data-original'),
+      name: e.querySelector('h3 > a')?.textContent,
+      path: e.querySelector('h3 > a')?.getAttribute('href'),
+      lastedChapter: {
+        name: e.querySelector('p > a')?.textContent,
+        path: e.querySelector('p > a')?.getAttribute('href'),
+      },
+      views: e.querySelector("p > span")?.textContent?.trim()
+    }
+  })
+  return list
+}
 
 // get comic card info (homePage, findPage)
 async function getComicCard(data: string) {
