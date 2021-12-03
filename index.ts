@@ -48,7 +48,7 @@ const options = {
       },
     ],
   },
-  apis: ["./src/routes/index.js"],
+  apis: ["./src/routes/index.ts", "./src/routes/index.js", './dist/src/models/index.js'],
 };
 
 const specs = swaggerJsDoc(options);
@@ -72,5 +72,5 @@ app.get("/", (req, res) =>
 app.use("/api/v1", Router);
 
 app.listen(PORT, () => {
-  console.log("Listening at http://localhost:" + PORT);
+  console.log("🚀🚀🚀 Listening at http://localhost:" + PORT);
 });

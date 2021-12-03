@@ -36,14 +36,37 @@ class Controller {
     }
   }
 
+  static async getTopComicMonth(req: Request, res: Response, next: NextFunction) {
+    try {
+      // const { pagination, page, limit, offset } = res.locals;
+
+      const list = await Model.getTopComicMonth();
+
+      res.status(200).json(list);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getHomeComment(req: Request, res: Response, next: NextFunction) {
+    try {
+      // const { pagination, page, limit, offset } = res.locals;
+
+      const list = await Model.getHomeComment();
+
+      res.status(200).json(list);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   static async getHotPage(req: Request, res: Response, next: NextFunction) {
     try {
-      const { _page } = req.query;
+      const { page } = res.locals;
       // const { offset } = pageToPagination(_page);
 
-      const list = (await Model.getHotPage())[0];
+      const list = await Model.getHotPage(page)
 
-      console.log(list.length);
       res.status(200).json(list);
     } catch (error) {
       next(error);

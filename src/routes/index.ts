@@ -4,13 +4,19 @@ import paginate from "../middleware/paginate.js";
 
 const Router = express.Router();
 
-// home page
 /**
  * @swagger
  * /recently:
  *   get:
  *     summary: Retrieve a list of comic card info
  *     description: Retrieve a list of comics from nettruyen. Can be used to populate a list of fake comics when prototyping or testing an API.
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: The numbers of page to return
  *     responses:
  *       200:
  *         description: A list of comics.
@@ -39,6 +45,39 @@ const Router = express.Router();
  */
 Router.get("/recently", paginate, Controller.getRecentUpdated);
 
+
+/**
+ * @swagger
+ * /top-comic/month:
+ *   get:
+ *     summary: Retrieve a list of top comic in month
+ *     description: Retrieve a list of comics from nettruyen. Can be used to populate a list of fake comics when prototyping or testing an API.
+ *     responses:
+ *       200:
+ *         description: A list of comics.
+ *         content:
+ *           application/json:
+ *            schema:
+ *              type: object
+ */
+Router.get('/top-comic/month', Controller.getTopComicMonth)
+
+/**
+ * @swagger
+ * /home-comment:
+ *   get:
+ *     summary: Retrieve a list of top comic in month
+ *     description: Retrieve a list of comics from nettruyen. Can be used to populate a list of fake comics when prototyping or testing an API.
+ *     responses:
+ *       200:
+ *         description: A list of comics.
+ *         content:
+ *           application/json:
+ *            schema:
+ *              type: object
+ */
+Router.get('/home-comment', Controller.getHomeComment)
+
 /**
  * @swagger
  * /hot:
@@ -53,9 +92,8 @@ Router.get("/recently", paginate, Controller.getRecentUpdated);
  *            schema:
  *              type: object
  */
-Router.get("/hot/", Controller.getHotPage);
+Router.get("/hot/", paginate, Controller.getHotPage);
 
-// comic page
 /**
  * @swagger
  * /truyen-tranh/{id}:
@@ -80,7 +118,6 @@ Router.get("/hot/", Controller.getHotPage);
  */
 Router.get("/truyen-tranh/:id", Controller.getComicPage);
 
-// chapter page
 /**
  * @swagger
  * /truyen-tranh/{id}/{chapterId}/{hash}:
@@ -94,21 +131,21 @@ Router.get("/truyen-tranh/:id", Controller.getComicPage);
  *         description: endpoint path
  *         schema:
  *           type: string
- *           example: monster-ga-afureru-sekai-ni-natta-node-suki-ni-ikitai-to-omoimasu-25132
+ *           example: vo-luyen-dinh-phong
  *       - in: path
  *         name: chapterId
  *         required: true
  *         description: endpoint path
  *         schema:
  *           type: string
- *           example: chap-16
+ *           example: chap-1735
  *       - in: path
  *         name: hash
  *         required: true
  *         description: endpoint path
  *         schema:
  *           type: string
- *           example: 779443
+ *           example: 796832
  *     responses:
  *       200:
  *         description: A list of comics.
@@ -117,12 +154,11 @@ Router.get("/truyen-tranh/:id", Controller.getComicPage);
  *            schema:
  *              type: object
  */
+
 Router.get("/truyen-tranh/:id/:chapterId/:hash", Controller.getChapterPage);
 
-// find page
 Router.get("/find/", Controller.findComicPage);
 
-// image
 /**
  * @swagger
  * /cors:
@@ -134,7 +170,7 @@ Router.get("/find/", Controller.findComicPage);
  *         name: user
  *         description: The user to create.
  *         schema:
- *           type: object
+ *           type: json
  *           required:
  *             - url
  *           properties:
@@ -151,10 +187,8 @@ Router.get("/find/", Controller.findComicPage);
  */
 
 Router.get("/cors/:proxyUrl*", Controller.corsAnywhere);
-Router.get("/cors", Controller.corsAnywhere);
+Router.get("/cors", Controller.corsAnywhere);     // TODO: fix swagger can't use above route
 
-// test
-Router.get("/test", Controller.test);
 
 /**
  * @swagger
@@ -170,5 +204,7 @@ Router.get("/test", Controller.test);
  *            schema:
  *              type: object
  */
+Router.get("/test", Controller.test);
+
 
 export default Router;

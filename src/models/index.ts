@@ -1,13 +1,12 @@
 import axios from "axios";
-import { ErrorRequestHandler } from "express";
+import e, { ErrorRequestHandler } from "express";
 // import dotenv from "dotenv";
 import { JSDOM } from "jsdom";
 import path from "path";
 import { GENRES_LIST } from "../../constants.js";
 import { API_URL } from "../../config.env.js";
 
-import {readFileSync, write, writeFileSync} from 'fs'
-
+import { readFileSync, write, writeFileSync } from "fs";
 
 //  CONFIG
 // dotenv.config({
@@ -41,24 +40,36 @@ class Model {
 
   static async RecentUpdate(page: number) {
     const { data } = await instance.get(`/?page=${page || 1}`);
-    writeFileSync("../../test.html", data)
+    writeFileSync("../../test.html", data);
     const result = await getComicCard(data);
-    const res2 = await getTopList(data);
     const res3 = await getNewComment(data);
     return result && result[0];
     // return res2 && res2[0]
     // return res3 && res3[0];
   }
 
-  static async getHotPage() {
-    const { data } = await instance.get(`/hot`);
-    return getComicCard(data);
+  static async getTopComicMonth() {
+    const { data } = await instance.get(`/`);
+    const result = await getTopList(data);
+    return result && result[0];
+  }
+
+  static async getHomeComment() {
+    const { data } = await instance.get(`/`);
+    const result = await getNewComment(data);
+    return result && result[0];
+  }
+
+  static async getHotPage(page?: number) {
+    const { data } = await instance.get(`/hot?${page || 1}`);
+    const result = await getComicCard(data);
+    return result && result[0];
   }
 
   static async getComicPage(path: string) {
     try {
       const { data } = await instance.get(`${path}`);
-      console.log(`${path}`);
+      // console.log(`${path}`);
       const result: any = parseListGen(
         data,
         {
@@ -66,6 +77,9 @@ class Model {
           posterUrl: {
             selector: ".col-image  > img",
             attribute: "src",
+            callback: (e: string) => {
+              return e.indexOf("http") === -1 ? "http" + e : e;
+            },
           },
           author: { selector: ".author > .col-xs-8", attribute: "" },
           status: { selector: ".status > .col-xs-8", attribute: "" },
@@ -108,8 +122,8 @@ class Model {
 
       return result;
     } catch (error: unknown) {
-      if( error instanceof Error ) console.log(error.message);
-      else console.log(error)
+      if (error instanceof Error) console.log(error.message);
+      else console.log(error);
     }
   }
 
@@ -122,8 +136,8 @@ class Model {
       const { data } = await instance.get(`/tim-truyen-nang-cao?genres=${ids}`);
       return getComicCard(data);
     } catch (error: unknown) {
-      if( error instanceof Error ) console.log(error.message);
-      else console.log(error)
+      if (error instanceof Error) console.log(error.message);
+      else console.log(error);
     }
   }
 
@@ -136,9 +150,9 @@ class Model {
         chapterName: {
           selector: ".txt-primary > span",
           attribute: "",
-          callback: (function T (str: string) {
-            return str.replace("- ", "")
-          }),
+          callback: function T(str: string) {
+            return str.replace("- ", "");
+          },
         },
         updateAt: {
           selector: ".top > i",
@@ -161,7 +175,7 @@ class Model {
           selectorAll: "option",
           attribute: "",
           callback: (data: string) => {
-            console.log(data);
+            // console.log(data);
             return data;
           },
         },
@@ -173,52 +187,161 @@ class Model {
         }
       }
     );
-    console.log(result);
+    // console.log(result);
     return result;
   }
 }
 
-Model.RecentUpdate(1).then(data => console.log(data))
+// Model.RecentUpdate(1).then((data) => console.log(data));
 // --------------------------------------------------------------
 // --------------------------------------------------------------
 // --------------------------------------------------------------
+// getCommentInChapterPage("12345", 1).then((r) => console.log(r));
+// console.log(getComicIdBySlug('http://www.nettruyenpro.com/truyen-tranh/het-nhu-han-quang-gap-nang-gat-28247'))
 
-async function getNewComment(data: string) {
 
-  const list = parseListGen( data, [
-    {selectorAll: '.box > .scroll-y > ul > li', attribute: ''}
-  ] , (e: HTMLElement) => {
-    return {
-      name: e.querySelector('h3 > a')?.textContent,
-      path: e.querySelector('h3 > a')?.getAttribute('href'),
-      authorName: e.querySelector('a > span')?.textContent,
-      date: e.querySelector('abbr')?.getAttribute('title'),
-      time: e.querySelector('abbr')?.textContent,
-      content: e.querySelector('p')?.textContent,
 
-    }
-  });
 
-  return list
+// TODO: CHECK VALID SLUG
+function getComicIdBySlug(slug: string) {
+  return slug.slice(slug.lastIndexOf("-") + 1, -1);
 }
 
-async function getTopList (data: string) {
-  const list = await parseListGen(data, [
-  {selectorAll: '#topMonth > ul > li', attribute: '', callback: (e: string) =>   e}
-  ], (e: HTMLElement) => {
-    return {
-      top: e.querySelector('span')?.textContent,
-      posterUrl: e.querySelector('div > a > img')?.getAttribute('data-original'),
-      name: e.querySelector('h3 > a')?.textContent,
-      path: e.querySelector('h3 > a')?.getAttribute('href'),
-      lastedChapter: {
-        name: e.querySelector('p > a')?.textContent,
-        path: e.querySelector('p > a')?.getAttribute('href'),
+function getChapterIdBySlug(slug: string) {
+  return slug.slice(slug.lastIndexOf("/") + 1, -1);
+}
+
+async function getCommentInChapterPage(
+  comicId: string | number,
+  page?: number
+) {
+  const { data } = await instance.get(
+    `http://www.nettruyenpro.com/Comic/Services/CommentService.asmx/GetList?comicId=${comicId}&orderBy=0&chapterId=0&parentId=0&pageNumber=${page}`
+  );
+  // console.log(data.response)
+  // console.log(data.pager)
+
+  const pager = parseListGen(
+    data.pager,
+    {
+      pageInfo: {
+        selector: ".pagination",
+        attribute: "",
+        callback: (r: string) => {
+          const info = r
+            .trim()
+            .slice(r.trim().indexOf(" "), r.trim().indexOf("«"))
+            .trim()
+            .split(" ")
+            .filter((s) => s !== "of");
+          return {
+            current: info[0],
+            max: info[1],
+          };
+        },
       },
-      views: e.querySelector("p > span")?.textContent?.trim()
+    },
+    (e: Element, attr: string) => {
+      if (!attr) return e.textContent || "";
+      else {
+        return e.getAttribute(attr);
+      }
     }
-  })
-  return list
+  );
+
+  const comment = parseListGen(
+    data.response,
+    {
+      res: {
+        selectorAll: ".journalrow",
+        attribute: "",
+        customSelector: true,
+        callback: (e) => e,
+      },
+    },
+    (e: Element, attr: string, query, i) => {
+      if (i === "res")
+        return {
+          username: e?.querySelector(".authorname")?.textContent,
+          role: e?.querySelector(".member")?.textContent,
+          avatarUrl: e?.querySelector(".author > img")?.getAttribute("src"), // TODO: Validate link, Ex:  avatarUrl: '//s.nettruyenpro.com/Data/SiteImages/anonymous.png',
+          abbr: e?.querySelector("abbr")?.getAttribute("title"),
+          datednf: e?.querySelector("abbr")?.textContent?.trim(),
+          chapterName: e?.querySelector(".cmchapter")?.textContent, // NOTE: Can be undefined by src
+          content: e.querySelector(".summary")?.textContent,
+
+          reply: [...e.querySelectorAll(".jcmt > li:not([class])")].map((e) => {
+            return {
+              username: e?.querySelector(".authorname")?.textContent,
+              role: e?.querySelector(".member")?.textContent,
+              avatarUrl: e?.querySelector(".author > img")?.getAttribute("src"), // TODO: Validate link, Ex:  avatarUrl: '//s.nettruyenpro.com/Data/SiteImages/anonymous.png',
+              abbr: e?.querySelector("abbr")?.getAttribute("title"),
+              datednf: e?.querySelector("abbr")?.textContent?.trim(),
+              chapterName: e?.querySelector(".cmchapter")?.textContent, // NOTE: Can be undefined by src
+              content: e.querySelector(".summary")?.textContent,
+            };
+          }),
+        };
+      if (!attr) return e.textContent || "";
+      else {
+        return e.getAttribute(attr);
+      }
+    }
+  );
+
+  return comment;
+}
+
+async function getNewComment(data: string) {
+  const list = parseListGen(
+    data,
+    [{ selectorAll: ".box > .scroll-y > ul > li", attribute: "" }],
+    (e: HTMLElement) => {
+      return {
+        name: e.querySelector("h3 > a")?.textContent,
+        path: e
+          .querySelector("h3 > a")
+          ?.getAttribute("href")
+          ?.replace("http://www.nettruyenpro.com", ""),
+        url: e.querySelector("h3 > a")?.getAttribute("href"),
+        authorName: e.querySelector("a > span")?.textContent,
+        date: e.querySelector("abbr")?.getAttribute("title"),
+        time: e.querySelector("abbr")?.textContent,
+        content: e.querySelector("p")?.textContent,
+      };
+    }
+  );
+
+  return list;
+}
+
+async function getTopList(data: string) {
+  const list = await parseListGen(
+    data,
+    [
+      {
+        selectorAll: "#topMonth > ul > li",
+        attribute: "",
+        callback: (e: string) => e,
+      },
+    ],
+    (e: HTMLElement) => {
+      return {
+        top: e.querySelector("span")?.textContent,
+        posterUrl: e
+          .querySelector("div > a > img")
+          ?.getAttribute("data-original"),
+        name: e.querySelector("h3 > a")?.textContent,
+        path: e.querySelector("h3 > a")?.getAttribute("href"),
+        lastedChapter: {
+          name: e.querySelector("p > a")?.textContent,
+          path: e.querySelector("p > a")?.getAttribute("href"),
+        },
+        views: e.querySelector("p > span")?.textContent?.trim(),
+      };
+    }
+  );
+  return list;
 }
 
 // get comic card info (homePage, findPage)
@@ -233,16 +356,17 @@ async function getComicCard(data: string) {
           customSelector: true,
         },
       ],
-      (e: Element, attr: string, query: queryA_T , i: number) => {
+      (e: Element, attr: string, query: queryA_T, i: number) => {
         if (query[i].customSelector) {
-          const tmp: string[] = e.textContent?.split("\n").filter((str) => {
-            return str;
-          }) || [];
+          const tmp: string[] =
+            e.textContent?.split("\n").filter((str) => {
+              return str;
+            }) || [];
 
-          type res_T = {
-            [key: string]: any
-          }
-          const result: res_T = {};
+          // type res_T = {
+          //   [key: string]: any
+          // }
+          const result: any = {};
 
           const labels = [
             "Thể loại:",
@@ -267,19 +391,22 @@ async function getComicCard(data: string) {
           tmp.forEach((str) => {
             for (let i = 0; i < labels.length; i++) {
               if (str.includes(labels[i])) {
-                result[props[i]] = str.replace(labels[i], "");
+                if (props[i] === "kind")
+                  result[props[i]] = str.replace(labels[i], "").split(", ");
+                else result[props[i]] = str.replace(labels[i], "");
               }
             }
           });
 
           result.name = e.querySelector(".title")?.textContent || null;
-          result.posterPath = e
-            .querySelector(".img_a")?.getAttribute("data-original") || null;
+          result.posterPath =
+            e.querySelector(".img_a")?.getAttribute("data-original") || null;
           if (result.posterPath?.indexOf("http:") === -1) {
             result.posterPath = "http:" + result.posterPath;
           }
-          result.path = e
-            .querySelector("a")?.getAttribute("href")?.replace(API_URL, "") || null;
+          result.path =
+            e.querySelector("a")?.getAttribute("href")?.replace(API_URL, "") ||
+            null;
           result.id = result.path;
 
           const e2 = e.querySelectorAll(
@@ -303,8 +430,8 @@ async function getComicCard(data: string) {
     );
     return list;
   } catch (error: unknown) {
-    if( error instanceof Error ) console.log(error.message);
-    else console.log(error)
+    if (error instanceof Error) console.log(error.message);
+    else console.log(error);
   }
 }
 
@@ -315,7 +442,7 @@ function parseList(html: string) {
   const eles = document.querySelectorAll(".logo");
 
   const list = [...eles].map((ele: Element) => {
-    const ele2 = ele.querySelector("img")
+    const ele2 = ele.querySelector("img");
     return ele2 && ele2.getAttribute("src");
   });
 
@@ -324,8 +451,7 @@ function parseList(html: string) {
 
 // callback for parseListGen
 function handleUrl(element: HTMLElement, attribute: string) {
-  const str = element
-    .getAttribute(attribute);
+  const str = element.getAttribute(attribute);
   return str && str.replace("http://www.nettruyenpro.com", "");
 }
 
@@ -347,19 +473,23 @@ type queryOne_T = {
   selectorAll?: string;
   attribute: string;
   customSelector?: boolean;
-  callback?: (a: any) => any
-}
+  callback?: (a: any) => any;
+};
 
 type queryO_T = {
-  [key: string | number]: queryOne_T
-}
-type queryA_T = queryOne_T[]
-type gCallback_T = (a: any, b: any, c?: any, d?: any) => any
+  [key: string | number]: queryOne_T;
+};
+type queryA_T = queryOne_T[];
+type gCallback_T = (a: any, b: any, c?: any, d?: any) => any;
 
-function parseListGen(html: string, query: queryO_T | queryA_T, callback: gCallback_T) {
+function parseListGen(
+  html: string,
+  query: queryO_T | queryA_T,
+  callback: gCallback_T
+) {
   const { window } = new JSDOM(html);
   const { document } = window;
-  const data: any = Array.isArray(query) ? [] : {}
+  const data: any = Array.isArray(query) ? [] : {};
   Object.keys(query).forEach((i: any) => {
     let res;
     if (query[i].selectorAll) {
@@ -377,9 +507,8 @@ function parseListGen(html: string, query: queryO_T | queryA_T, callback: gCallb
       res = query[i].callback?.(res);
     }
     data[i] = res;
-  })
+  });
   return data;
 }
 
 export default Model;
-
