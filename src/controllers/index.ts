@@ -90,14 +90,19 @@ class Controller {
     }
   }
 
+  static async getComicComment (req: Request, res: Response, next: NextFunction) {
+    try {
+      const path = req.body?.path || req.params.id;
+      const result = await Model.getComicComment(path)
+      return res.status(200).json(result);
+    } catch (error) {
+      next(error)
+    }
+  }
+
   static async findComicPage(req: Request, res: Response, next: NextFunction) {
     try {
       const { genres, minchapter, status } = req.query;
-      const statusList = [
-        { name: "Dang tien hanh", id: 1 },
-        { name: "da hoan thanh", id: 2 },
-        { name: "Tat ca", id: -1 },
-      ];
       const result = await Model.FindComic();
       return res.status(200).json(result[0]);
     } catch (error) {

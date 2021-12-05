@@ -120,6 +120,30 @@ Router.get("/truyen-tranh/:id", Controller.getComicPage);
 
 /**
  * @swagger
+ * /comic-comment/{id}:
+ *   get:
+ *     summary: Retrieve comic details
+ *     description: Retrieve a list of comics from nettruyen. Can be used to populate a list of fake comics when prototyping or testing an API.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: endpoint path
+ *         schema:
+ *           type: string
+ *           example: monster-ga-afureru-sekai-ni-natta-node-suki-ni-ikitai-to-omoimasu-25132
+ *     responses:
+ *       200:
+ *         description: A list of comics.
+ *         content:
+ *           application/json:
+ *            schema:
+ *              type: object
+ */
+Router.get("/comic-comment/:id", Controller.getComicComment);
+
+/**
+ * @swagger
  * /truyen-tranh/{id}/{chapterId}/{hash}:
  *   get:
  *     summary: Retrieve comic details

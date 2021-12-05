@@ -44,7 +44,7 @@ const options = {
     },
     servers: [
       {
-        url: SERVER_URL,
+        url: SERVER_URL,    // NOTE: config in server
       },
     ],
   },

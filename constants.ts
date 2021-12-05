@@ -77,10 +77,11 @@ export const STATUS: KV[] = [
   {key: 1, value: 'Ogging'},
   {key: 2, value: 'Completed'},
 ]
+
 // gender=-1
 export const FOR_USER : KV[]= [
   {key: 2, value: 'Male'},
-  {key: 1, value: 'Feale'},
+  {key: 1, value: 'Female'},
   {key: -1, value: 'All'}
 ]
 // sort=5

@@ -6,7 +6,7 @@ import path from "path";
 import { GENRES_LIST } from "../../constants.js";
 import { API_URL } from "../../config.env.js";
 
-import { readFileSync, write, writeFileSync } from "fs";
+// import { readFileSync, write, writeFileSync } from "fs";
 
 //  CONFIG
 // dotenv.config({
@@ -40,9 +40,9 @@ class Model {
 
   static async RecentUpdate(page: number) {
     const { data } = await instance.get(`/?page=${page || 1}`);
-    writeFileSync("../../test.html", data);
+    // writeFileSync("../../test.html", data);   // NOTE: Need to disable in production
     const result = await getComicCard(data);
-    const res3 = await getNewComment(data);
+    // const res3 = await getNewComment(data);
     return result && result[0];
     // return res2 && res2[0]
     // return res3 && res3[0];
@@ -187,8 +187,20 @@ class Model {
         }
       }
     );
-    // console.log(result);
     return result;
+  }
+
+
+  static async getComicComment(path: string) {
+    try {
+      const comicId = getComicIdBySlug(path);
+      console.log(comicId)
+
+      return await getCommentInChapterPage(comicId);
+    } catch (error: unknown) {
+      if (error instanceof Error) console.log(error.message);
+      else console.log(error);
+    }
   }
 }
 
@@ -199,12 +211,9 @@ class Model {
 // getCommentInChapterPage("12345", 1).then((r) => console.log(r));
 // console.log(getComicIdBySlug('http://www.nettruyenpro.com/truyen-tranh/het-nhu-han-quang-gap-nang-gat-28247'))
 
-
-
-
 // TODO: CHECK VALID SLUG
 function getComicIdBySlug(slug: string) {
-  return slug.slice(slug.lastIndexOf("-") + 1, -1);
+  return slug.slice(slug.lastIndexOf("-") + 1);
 }
 
 function getChapterIdBySlug(slug: string) {
@@ -215,8 +224,9 @@ async function getCommentInChapterPage(
   comicId: string | number,
   page?: number
 ) {
+  console.log("🚀 ~ file: index.ts ~ line 227 ~ comicId", comicId)
   const { data } = await instance.get(
-    `http://www.nettruyenpro.com/Comic/Services/CommentService.asmx/GetList?comicId=${comicId}&orderBy=0&chapterId=0&parentId=0&pageNumber=${page}`
+    `http://www.nettruyenpro.com/Comic/Services/CommentService.asmx/GetList?comicId=${comicId}&orderBy=0&chapterId=0&parentId=0&pageNumber=${page || 1}`
   );
   // console.log(data.response)
   // console.log(data.pager)
@@ -289,7 +299,10 @@ async function getCommentInChapterPage(
     }
   );
 
-  return comment;
+  return {
+    comment,
+    pager,
+  };
 }
 
 async function getNewComment(data: string) {
@@ -482,7 +495,7 @@ type queryO_T = {
 type queryA_T = queryOne_T[];
 type gCallback_T = (a: any, b: any, c?: any, d?: any) => any;
 
-function parseListGen(
+export function parseListGen(
   html: string,
   query: queryO_T | queryA_T,
   callback: gCallback_T
