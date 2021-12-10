@@ -5,24 +5,22 @@ import { JSDOM } from "jsdom";
 import path from "path";
 import { GENRES_LIST } from "../../constants.js";
 import { API_URL } from "../../config.env.js";
+import { distance2Date } from "../utils/time.js";
 
-// import { readFileSync, write, writeFileSync } from "fs";
-
-//  CONFIG
-// dotenv.config({
-//   // for commonjs use __dirname, "../.env"
-//   path: path.resolve(new URL("../../.env", import.meta.url).pathname),
-// });
+// STUB: Naming rules
+// ...Url: include domain: "https://......./a/b/c"
+// ...Path: not include domain: "/a/b/c"
+// ...Slug: one part of Path: "a"
+// updatedAt: Date type
+// updatedDistance: Ex: 3 ngay truoc
 
 const instance = axios.create({
   baseURL: API_URL,
   headers: {
-    // "X-Requested-With": "XMLHttpRequest",
     Referer: API_URL,
   },
 });
 
-//  EXPORT CLASS
 class Model {
   // static async getLogoUrl() {
   //   try {
@@ -42,10 +40,7 @@ class Model {
     const { data } = await instance.get(`/?page=${page || 1}`);
     // writeFileSync("../../test.html", data);   // NOTE: Need to disable in production
     const result = await getComicCard(data);
-    // const res3 = await getNewComment(data);
     return result && result[0];
-    // return res2 && res2[0]
-    // return res3 && res3[0];
   }
 
   static async getTopComicMonth() {
@@ -69,7 +64,6 @@ class Model {
   static async getComicPage(path: string) {
     try {
       const { data } = await instance.get(`${path}`);
-      // console.log(`${path}`);
       const result: any = parseListGen(
         data,
         {
@@ -88,7 +82,7 @@ class Model {
             selector: ".list-info > li:last-child > .col-xs-8",
             attribute: "",
           },
-          rete: { selector: ".mrt5  > span > span:first-child", attribute: "" },
+          rate: { selector: ".mrt5  > span > span:first-child", attribute: "" },
           views: { selector: ".mrt5  > span > span:last-child", attribute: "" },
           follows: { selector: ".follow > span > b", attribute: "" },
           detail: { selector: ".detail-content > p", attribute: "" },
@@ -96,13 +90,23 @@ class Model {
             selectorAll: "nav > ul > .row > .chapter > a",
             attribute: "",
           },
-          chapterLinks: {
+          chapterUrls: {
             selectorAll: "nav > ul > .row > .chapter > a",
             attribute: "href",
           },
-          chapterUpdateAt: {
+          chapterPaths: {
+            selectorAll: "nav > ul > .row > .chapter > a",
+            attribute: "href",
+            callback: (l) => l.map((e: string) => e.replace(API_URL, "")),
+          },
+          chapterUpdatedDistance: {
             selectorAll: "li > .col-xs-4.text-center.small",
             attribute: "",
+          },
+          chapterUpdatedAt: {
+            selectorAll: "li > .col-xs-4.text-center.small",
+            attribute: "",
+            callback: (l) => l.map((e: string) => distance2Date(e)),
           },
           chapterViews: {
             selectorAll: "li > .col-xs-3.text-center.small",
@@ -120,7 +124,25 @@ class Model {
       result.kind = result.kind.split(" - ");
       result.id = path;
 
-      return result;
+      return {
+        title: result.title,
+        posterUrl: result.posterUrl,
+        status: result.status,
+        kind: result.kind,
+        info: result.info,
+        rate: result.rate,
+        views: result.views,
+        follows: result.follows,
+        detail: result.detail,
+        chapters: result.chapters.map((c: string, i: number) => ({
+          name: c,
+          updatedAt: result.chapterUpdatedAt[i],
+          url: result.chapterUrls[i],
+          path: result.chapterPaths[i],
+          updatedDistance: result.chapterUpdatedDistance[i],
+          updatedView: result.chapterViews[i],
+        })),
+      }
     } catch (error: unknown) {
       if (error instanceof Error) console.log(error.message);
       else console.log(error);
@@ -154,7 +176,15 @@ class Model {
             return str.replace("- ", "");
           },
         },
-        updateAt: {
+        updatedAt: {
+          selector: ".top > i",
+          attribute: "",
+          callback: (data: string) =>
+            distance2Date(
+              data?.replace("[Cập nhật lúc: ", "").replace("]", "")
+            ),
+        },
+        updatedDistance: {
           selector: ".top > i",
           attribute: "",
           callback: (data: string) =>
@@ -190,11 +220,10 @@ class Model {
     return result;
   }
 
-
   static async getComicComment(path: string) {
     try {
       const comicId = getComicIdBySlug(path);
-      console.log(comicId)
+      console.log(comicId);
 
       return await getCommentInChapterPage(comicId);
     } catch (error: unknown) {
@@ -224,9 +253,11 @@ async function getCommentInChapterPage(
   comicId: string | number,
   page?: number
 ) {
-  console.log("🚀 ~ file: index.ts ~ line 227 ~ comicId", comicId)
+  console.log("🚀 ~ file: index.ts ~ line 227 ~ comicId", comicId);
   const { data } = await instance.get(
-    `http://www.nettruyenpro.com/Comic/Services/CommentService.asmx/GetList?comicId=${comicId}&orderBy=0&chapterId=0&parentId=0&pageNumber=${page || 1}`
+    `${API_URL}/Comic/Services/CommentService.asmx/GetList?comicId=${comicId}&orderBy=0&chapterId=0&parentId=0&pageNumber=${
+      page || 1
+    }`
   );
   // console.log(data.response)
   // console.log(data.pager)
@@ -272,22 +303,24 @@ async function getCommentInChapterPage(
     (e: Element, attr: string, query, i) => {
       if (i === "res")
         return {
+          id: e?.getAttribute("id"),
           username: e?.querySelector(".authorname")?.textContent,
           role: e?.querySelector(".member")?.textContent,
           avatarUrl: e?.querySelector(".author > img")?.getAttribute("src"), // TODO: Validate link, Ex:  avatarUrl: '//s.nettruyenpro.com/Data/SiteImages/anonymous.png',
           abbr: e?.querySelector("abbr")?.getAttribute("title"),
           datednf: e?.querySelector("abbr")?.textContent?.trim(),
-          chapterName: e?.querySelector(".cmchapter")?.textContent, // NOTE: Can be undefined by src
+          chapterName: e?.querySelector(".cmchapter")?.textContent, // NOTE: Can be undefined in src
           content: e.querySelector(".summary")?.textContent,
 
           reply: [...e.querySelectorAll(".jcmt > li:not([class])")].map((e) => {
             return {
+              id: e?.getAttribute("id"),
               username: e?.querySelector(".authorname")?.textContent,
               role: e?.querySelector(".member")?.textContent,
               avatarUrl: e?.querySelector(".author > img")?.getAttribute("src"), // TODO: Validate link, Ex:  avatarUrl: '//s.nettruyenpro.com/Data/SiteImages/anonymous.png',
               abbr: e?.querySelector("abbr")?.getAttribute("title"),
               datednf: e?.querySelector("abbr")?.textContent?.trim(),
-              chapterName: e?.querySelector(".cmchapter")?.textContent, // NOTE: Can be undefined by src
+              chapterName: e?.querySelector(".cmchapter")?.textContent, // NOTE: Can be undefined in src
               content: e.querySelector(".summary")?.textContent,
             };
           }),
@@ -356,7 +389,6 @@ async function getTopList(data: string) {
   );
   return list;
 }
-
 // get comic card info (homePage, findPage)
 async function getComicCard(data: string) {
   try {
@@ -376,9 +408,6 @@ async function getComicCard(data: string) {
               return str;
             }) || [];
 
-          // type res_T = {
-          //   [key: string]: any
-          // }
           const result: any = {};
 
           const labels = [
@@ -397,7 +426,7 @@ async function getComicCard(data: string) {
             "status",
             "views",
             "follows",
-            "updateAt",
+            "updatedDistance",
             "anotherName",
           ];
 
@@ -407,15 +436,19 @@ async function getComicCard(data: string) {
                 if (props[i] === "kind")
                   result[props[i]] = str.replace(labels[i], "").split(", ");
                 else result[props[i]] = str.replace(labels[i], "");
+
+                if (props[i] === "updatedDistance") {
+                  result.updatedAt = distance2Date(str.replace(labels[i], ""));
+                }
               }
             }
           });
 
           result.name = e.querySelector(".title")?.textContent || null;
-          result.posterPath =
+          result.posterUrl =
             e.querySelector(".img_a")?.getAttribute("data-original") || null;
-          if (result.posterPath?.indexOf("http:") === -1) {
-            result.posterPath = "http:" + result.posterPath;
+          if (result.posterUrl?.indexOf("http:") === -1) {
+            result.posterUrl = "http:" + result.posterUrl;
           }
           result.path =
             e.querySelector("a")?.getAttribute("href")?.replace(API_URL, "") ||
@@ -429,7 +462,8 @@ async function getComicCard(data: string) {
             return {
               chapterName: e.querySelector("a")?.textContent,
               chapterUrl: e.querySelector("a")?.getAttribute("href"),
-              updateAt: e.querySelector("i")?.textContent,
+              updatedDistance: e.querySelector("i")?.textContent,
+              updatedAt: distance2Date(e.querySelector("i")?.textContent || ""),
             };
           });
 
@@ -441,6 +475,7 @@ async function getComicCard(data: string) {
         }
       }
     );
+
     return list;
   } catch (error: unknown) {
     if (error instanceof Error) console.log(error.message);
@@ -495,6 +530,7 @@ type queryO_T = {
 type queryA_T = queryOne_T[];
 type gCallback_T = (a: any, b: any, c?: any, d?: any) => any;
 
+// TODO: Need refactor
 export function parseListGen(
   html: string,
   query: queryO_T | queryA_T,

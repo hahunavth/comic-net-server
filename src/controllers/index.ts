@@ -2,7 +2,7 @@
 import corsAnyware from "cors-anywhere";
 // declare module 'cors-anywhere'
 import axios from "axios";
-import {Request, Response, NextFunction} from 'express'
+import { Request, Response, NextFunction } from "express";
 
 import Model from "../models/index.js";
 
@@ -23,26 +23,47 @@ class Controller {
     }
   }
 
-  static async getRecentUpdated(req: Request, res: Response, next: NextFunction) {
+  static async getRecentUpdated(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const { pagination, page, limit, offset } = res.locals;
 
       const list = await Model.RecentUpdate(page);
 
       console.log(list?.length);
-      res.status(200).json(list);
+      res.status(200).json({
+        success: true,
+        pagination: {
+          page,
+          limit,
+        },
+        data: list,
+      });
     } catch (error) {
       next(error);
     }
   }
 
-  static async getTopComicMonth(req: Request, res: Response, next: NextFunction) {
+  static async getTopComicMonth(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       // const { pagination, page, limit, offset } = res.locals;
 
       const list = await Model.getTopComicMonth();
 
-      res.status(200).json(list);
+      res.status(200).json({
+        success: true,
+        pagination: {
+          // page, limit
+        },
+        data: list,
+      });
     } catch (error) {
       next(error);
     }
@@ -54,7 +75,13 @@ class Controller {
 
       const list = await Model.getHomeComment();
 
-      res.status(200).json(list);
+      res.status(200).json({
+        success: true,
+        pagination: {
+          //   page, limit
+        },
+        data: list,
+      });
     } catch (error) {
       next(error);
     }
@@ -65,9 +92,15 @@ class Controller {
       const { page } = res.locals;
       // const { offset } = pageToPagination(_page);
 
-      const list = await Model.getHotPage(page)
+      const list = await Model.getHotPage(page);
 
-      res.status(200).json(list);
+      res.status(200).json({
+        success: true,
+        pagination: {
+          // page, limit
+        },
+        data: list,
+      });
     } catch (error) {
       next(error);
     }
@@ -90,13 +123,19 @@ class Controller {
     }
   }
 
-  static async getComicComment (req: Request, res: Response, next: NextFunction) {
+  static async getComicComment(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const path = req.body?.path || req.params.id;
-      const result = await Model.getComicComment(path)
-      return res.status(200).json(result);
+      const result = await Model.getComicComment(path);
+      return res.status(200).json({
+        data: result,
+      });
     } catch (error) {
-      next(error)
+      next(error);
     }
   }
 
@@ -104,7 +143,7 @@ class Controller {
     try {
       const { genres, minchapter, status } = req.query;
       const result = await Model.FindComic();
-      return res.status(200).json(result[0]);
+      return res.status(200).json({ data: result[0] });
     } catch (error) {
       next(error);
     }
@@ -114,7 +153,7 @@ class Controller {
     try {
       // console.log(req.path);
       const data = await Model.getChapterPage(req.path);
-      res.status(200).json(data);
+      res.status(200).json({ data });
     } catch (error) {
       next(error);
     }

@@ -1,4 +1,4 @@
-import { PORT, SERVER_URL } from "./config.env.js";
+import { API_URL, PORT, SERVER_URL } from "./config.env.js";
 import express from "express";
 import cors from "cors";
 import logger from "morgan";
@@ -14,11 +14,9 @@ import { checkDotEnv } from "./src/utils/index.js";
 // import "./src/routes/books.js";
 
 const app = express();
-// const PORT = process.env.PORT || 8000;
-// console.log("🚀 ~ file: index.js ~ line 17 ~ PORT", PORT);
 
 app.use(cors());
-// app.use(cache());
+app.use(cache());
 app.use(logger("dev"));
 app.use(errorHandler);
 app.use(bodyParser.json());
@@ -38,8 +36,8 @@ const options = {
       },
       contact: {
         name: "NetCORS",
-        url: "http:localhost:8000",
-        email: "info@email.com",
+        url: 'https://github.com/hahunavth',
+        email: 'vuthanhha.2001@gmail.com',
       },
     },
     servers: [
@@ -65,7 +63,7 @@ app.get("/", (req, res) =>
   res.status(200).json({
     success: true,
     message: "Server running in: " + SERVER_URL ,
-    info: "You can test api at " + `http://localhost:8000/docs`
+    info: "You can test api at: " + `https://hahunavth-express-api.heroku.com/docs`
   })
 );
 
