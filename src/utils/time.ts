@@ -17,24 +17,24 @@ export function distance2Date(distance: string) {
       return date;
     }
 
-    const secondsAgo = distance.match(REGEX.distanceDate)?.shift();
+    const secondsAgo = distance.match(REGEX.distanceSecond)?.shift();
     if (secondsAgo) {
       const date = new Date();
-      date.setDate(date.getDate() - Number.parseInt(secondsAgo, 0));
+      date.setSeconds(date.getSeconds() - Number.parseInt(secondsAgo, 0));
       return date;
     }
 
     const minutesAgo = distance.match(REGEX.distanceMinute)?.shift();
     if (minutesAgo) {
       const date = new Date();
-      date.setDate(date.getMinutes() - Number.parseInt(minutesAgo, 0));
+      date.setMinutes(date.getMinutes() - Number.parseInt(minutesAgo, 0));
       return date;
     }
 
     const hoursAgo = distance.match(REGEX.distanceHour)?.shift();
     if (hoursAgo) {
       const date = new Date();
-      date.setDate(date.getHours() - Number.parseInt(hoursAgo, 0));
+      date.setHours(date.getHours() - Number.parseInt(hoursAgo, 0));
       return date;
     }
 

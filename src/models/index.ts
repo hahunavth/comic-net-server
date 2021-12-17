@@ -6,6 +6,7 @@ import path from "path";
 import { GENRES_LIST } from "../../constants.js";
 import { API_URL } from "../../config.env.js";
 import { distance2Date } from "../utils/time.js";
+import { queryGen_T, resComicDetail_T, resComicItem_T } from "../utils/api.js";
 
 // STUB: Naming rules
 // ...Url: include domain: "https://......./a/b/c"
@@ -122,9 +123,10 @@ class Model {
       );
 
       result.kind = result.kind.split(" - ");
-      result.id = path;
+      result.path = path;
 
       return {
+        path: result.path,
         title: result.title,
         posterUrl: result.posterUrl,
         status: result.status,
@@ -134,6 +136,7 @@ class Model {
         views: result.views,
         follows: result.follows,
         detail: result.detail,
+
         chapters: result.chapters.map((c: string, i: number) => ({
           name: c,
           updatedAt: result.chapterUpdatedAt[i],
@@ -217,6 +220,7 @@ class Model {
         }
       }
     );
+    result.path = path;
     return result;
   }
 
@@ -516,7 +520,7 @@ function handleUrl(element: HTMLElement, attribute: string) {
   Return type follow query type!
 */
 
-type queryOne_T = {
+export type queryOne_T = {
   selector?: string;
   selectorAll?: string;
   attribute: string;
@@ -524,10 +528,10 @@ type queryOne_T = {
   callback?: (a: any) => any;
 };
 
-type queryO_T = {
+export type queryO_T = {
   [key: string | number]: queryOne_T;
 };
-type queryA_T = queryOne_T[];
+export type queryA_T = queryOne_T[];
 type gCallback_T = (a: any, b: any, c?: any, d?: any) => any;
 
 // TODO: Need refactor
