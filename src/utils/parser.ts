@@ -1,52 +1,203 @@
-// import axios from "axios";
-// import { ErrorRequestHandler } from "express";
-// import { JSDOM } from "jsdom";
-// import { GENRES_LIST } from "../../constants.js";
-// import { API_URL } from "../../config.env.js";
+import axios from "axios";
+import { ErrorRequestHandler } from "express";
+import { JSDOM } from "jsdom";
+import { GENRES_LIST } from "../../constants.js";
+import { API_URL } from "../../config.env.js";
 
-
-// import { readFileSync, write, writeFileSync } from "fs";
-// import { URL } from "url";
-// import { argv } from "process";
-// import { callbackify } from "util";
-// import { stringify } from "querystring";
+import { readFileSync, write, writeFileSync } from "fs";
+import { URL } from "url";
+import { argv } from "process";
+import { callbackify } from "util";
+import { stringify } from "querystring";
+import { string } from "fp-ts";
 
 // // /* -------------------------------------------------------------------------- */
 // // /*                              NOTE: DEPRECATED                              */
 // // /* -------------------------------------------------------------------------- */
 
-// // // Prevent app crash
-// // // process.on('uncaughtException', (error, origin) => {
-// // //   console.log('----- Uncaught exception -----')
-// // //   // console.log(error)
-// // //   console.log('----- Exception origin -----')
-// // //   // console.log(origin)
-// // // })
+const myUrl = "http://nettruyengo.com/";
 
-// // // process.on('unhandledRejection', (reason, promise) => {
-// // //   console.log('----- Unhandled Rejection at -----')
-// // //   // console.log(promise)
-// // //   console.log('----- Reason -----')
-// // //   // console.log(reason)
-// // // })
+export async function getDocumentByUrl(
+  urlString: string
+): Promise<HTMLElement | undefined> {
+  try {
+    const url = new URL(urlString);
+    const { data } = await axios.get(url.href);
+    const html = new JSDOM(data);
+    const document = html.window.document.body;
 
-// const myUrl = "http://nettruyengo.com/";
+    return document;
+  } catch (error: unknown) {
+    if (error instanceof Error) console.warn(error.message);
+    else console.warn(error);
+  }
+}
 
-// async function getDocumentByUrl(
-//   urlString: string
-// ): Promise<Document | undefined> {
-//   try {
-//     const url = new URL(urlString);
-//     const { data } = await axios.get(url.href);
-//     const html = new JSDOM(data);
-//     const document = html.window.document;
+type QueryOneT<Tk> = {
+  selector: string;
+  attribute?: string;
+  nested?: QueryListT<Tk>;
+  callback?: (el: Element) => any;
+};
 
-//     return document;
-//   } catch (error: unknown) {
-//     if (error instanceof Error) console.log(error.message);
-//     else console.log(error);
-//   }
-// }
+type QueryAllT<Tk> = {
+  selectorAll: string;
+  attribute?: string;
+  nested?: QueryListT<Tk>;
+  callback?: (el: Element) => any;
+  aCallback?: (els: Element[]) => any;
+};
+
+type QueryItemT<Tk> = QueryOneT<Tk> | QueryAllT<Tk>;
+// type QueryArrT = QueryItemT[];
+type QueryListT<T> = {
+  [k in keyof T]: QueryItemT<T[k]>;
+};
+
+type QueryReturnT = {
+  [k: string]: string | string[] | QueryReturnT
+}
+
+const returnType = {
+  i: string,
+  b: {
+    c: string,
+  },
+};
+
+(async () => {
+  const doc = await getDocumentByUrl(API_URL);
+  if (doc) {
+    const res = parseListGen3<typeof returnType>(doc, {
+      i: { selector: "a", attribute: "href" },
+      b: {
+        selectorAll: "div",
+        nested: { c: { selector: "a", attribute: 'href' } },
+      },
+      // f: {
+      //   selectorAll: "a",
+      // },
+      // g: {
+      //   selector: "a",
+      //   nested: {
+      //     h: { selectorAll: "b" },
+      //   },
+      // },
+    });
+    console.log(res);
+  }
+})();
+
+function isQueryOneT<Tk>(obj: any): obj is QueryOneT<Tk> {
+  return obj.selector !== undefined;
+}
+
+function isQueryAllT<Tk>(arg: any): arg is QueryAllT<Tk> {
+  return arg.selectorAll !== undefined;
+}
+
+export function parseListGen3<T>(document: HTMLElement, query: QueryListT<T>) {
+  try {
+
+    let result: {
+      [k in keyof T]?: any;
+    } = {};
+    Object.keys(query).forEach((key, id) => {
+      // console.log(key);
+      const qItem = query[key as keyof T];
+
+      // if nested -> recursive
+      if (qItem.nested) {
+        let element = document;
+
+        if (isQueryOneT<any>(qItem)) {
+          const selectElement = document.querySelector(
+            qItem.selector
+          ) as HTMLElement;
+          if (selectElement !== null) element = selectElement;
+          else
+            console.warn(
+              `SELECTOR FAIL: key: ${key} -> selector: ${qItem.selector}`
+            );
+            result[key as keyof T] = {
+              ...parseListGen3<any>(element, qItem.nested),
+            };
+        }
+
+        if(isQueryAllT<any>(qItem)) {
+          const els = document.querySelectorAll(qItem.selectorAll);
+          if(!els) 
+          return [];
+          result[key as keyof T] = []
+          const elList = [...els];
+          const nested = qItem.nested
+          elList.forEach(el => {
+            result[key as keyof T].push(parseListGen3<any>(el as HTMLElement, nested))
+          })
+
+        }
+
+
+      } else {
+        // if not -> parse
+        // parse selector and selectorAll
+        if (isQueryOneT<any>(qItem))
+          result[key as keyof T] = parseItemOne<any>(document, qItem);
+        if (isQueryAllT<any>(qItem))
+          result[key as keyof T] = parseItemAll(document, qItem);
+      }
+    });
+    return result;
+
+  } catch (error: unknown) {
+    if (error instanceof Error) console.warn(error.message);
+    else console.warn(error);
+  }
+}
+
+function parseItemOne<T>(
+  document: Document | HTMLElement,
+  query: QueryOneT<T>
+): string | null {
+  // console.log("parse One", document, query);
+
+  const el = document.querySelector(query.selector);
+
+  // Check error
+  if (!el) {
+    console.warn(`not found ${query.selector}`);
+    return null;
+    // throw new Error(`not found: ${query.selector}`);
+  }
+
+  // Handle
+  if (query.attribute) return el.getAttribute(query.attribute);
+  if (query.callback) return query.callback(el);
+
+  // Not handle
+  throw new Error(`Need attr or callback: ${query}`);
+}
+
+function parseItemAll<T>(
+  document: Document | HTMLElement,
+  query: QueryAllT<T>
+) {
+  // console.log("parse All", document, query);
+
+  const result: any[] = [];
+  const els = document.querySelectorAll(query.selectorAll);
+
+  if (query.aCallback) {
+    query.aCallback([...els]);
+  }
+
+  els.forEach((el, id) => {
+    if (query.attribute) result.push(el.getAttribute(query.attribute));
+    if (query.callback) result.push(query.callback(el));
+  });
+
+  return result;
+}
 
 // // (async () => {
 // //   const doc = await getDocumentByUrl(myUrl);
@@ -258,7 +409,7 @@
 
 //     if (this.attribute !== undefined) {
 //       if (this.attribute === "")
-//         result[this.keyName] = element?.textContent 
+//         result[this.keyName] = element?.textContent
 //       else
 //       return { [this.keyName]: element?.getAttribute(this.attribute) };
 //     }

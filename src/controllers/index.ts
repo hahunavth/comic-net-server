@@ -5,6 +5,7 @@ import axios from "axios";
 import { Request, Response, NextFunction } from "express";
 
 import Model from "../models/index.js";
+import { FindComicProps } from "../../constants.js";
 
 const proxy = corsAnyware.createServer({
   setHeaders: {
@@ -141,9 +142,18 @@ class Controller {
 
   static async findComicPage(req: Request, res: Response, next: NextFunction) {
     try {
-      const { genres, minchapter, status } = req.query;
-      const result = await Model.FindComic();
-      return res.status(200).json({ data: result[0] });
+      const params: {
+        [k in keyof FindComicProps]?: any
+      } = req.query;
+
+      const result = await Model.FindComic({
+        gender: params.gender,
+        genres: params.genres,
+        minchapter: params.minchapter,
+        sort: params.sort,
+        status: params.status,
+      });
+      return res.status(200).json({ data: result && result[0] || [] });
     } catch (error) {
       next(error);
     }

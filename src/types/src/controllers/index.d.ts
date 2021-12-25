@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from "express";
 declare class Controller {
     static test(req: Request, res: Response, next: NextFunction): Promise<void>;
     static getRecentUpdated(req: Request, res: Response, next: NextFunction): Promise<void>;

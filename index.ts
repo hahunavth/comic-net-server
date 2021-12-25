@@ -2,7 +2,7 @@ import { API_URL, PORT, SERVER_URL } from "./config.env.js";
 import express from "express";
 import cors from "cors";
 import logger from "morgan";
-import bodyParser from "body-parser";
+// import bodyParser from "body-parser";
 import swaggerJsDoc from "swagger-jsdoc";
 import swaggerUiExpress from "swagger-ui-express";
 
@@ -19,7 +19,7 @@ app.use(cors());
 app.use(cache());
 app.use(logger("dev"));
 app.use(errorHandler);
-app.use(bodyParser.json());
+app.use(express.json());
 
 // Swagger
 const options = {

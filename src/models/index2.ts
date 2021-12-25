@@ -145,7 +145,7 @@ class Model {
           updatedDistance: result.chapterUpdatedDistance[i],
           updatedView: result.chapterViews[i],
         })),
-      }
+      };
     } catch (error: unknown) {
       if (error instanceof Error) console.log(error.message);
       else console.log(error);
@@ -155,7 +155,7 @@ class Model {
   static async FindComic(param: FindComicProps) {
     try {
       const { data } = await instance.get(
-        `/tim-truyen-nang-cao?genres=${param.genres}&nogenres=&gender=${param.gender}&status=${param.status}&sort=${param.sort}`
+        `/tim-truyen-nang-cao?genres=${param.gender}&nogenres=&gender=${param.genres}&status=${param.status}&sort=${param.sort}`
       );
       return getComicCard(data);
     } catch (error: unknown) {
