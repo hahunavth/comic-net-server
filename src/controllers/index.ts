@@ -143,7 +143,7 @@ class Controller {
   static async findComicPage(req: Request, res: Response, next: NextFunction) {
     try {
       const params: {
-        [k in keyof FindComicProps]?: any
+        [k in keyof FindComicProps]?: any;
       } = req.query;
 
       const result = await Model.FindComic({
@@ -153,7 +153,7 @@ class Controller {
         sort: params.sort,
         status: params.status,
       });
-      return res.status(200).json({ data: result && result[0] || [] });
+      return res.status(200).json({ data: (result && result[0]) || [] });
     } catch (error) {
       next(error);
     }
@@ -164,6 +164,36 @@ class Controller {
       // console.log(req.path);
       const data = await Model.getChapterPage(req.path);
       res.status(200).json({ data });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async findComicByName(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { name } = req.query;
+      const { pagination, page, limit, offset } = res.locals;
+
+      if (typeof name === "string") {
+        const list = await Model.getComicByName(name, page);
+        return res.status(200).json({
+          success: true,
+          pagination: {
+            pagination,
+            page,
+            limit,
+            offset,
+          },
+          data: list,
+        });
+      }
+      res.status(400).json({
+        message: "not found",
+      });
     } catch (error) {
       next(error);
     }

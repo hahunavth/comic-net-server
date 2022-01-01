@@ -74,15 +74,6 @@ const returnType = {
         selectorAll: "div",
         nested: { c: { selector: "a", attribute: 'href' } },
       },
-      // f: {
-      //   selectorAll: "a",
-      // },
-      // g: {
-      //   selector: "a",
-      //   nested: {
-      //     h: { selectorAll: "b" },
-      //   },
-      // },
     });
     console.log(res);
   }

@@ -7,6 +7,7 @@ import { FindComicProps, GENRES_LIST } from "../../constants.js";
 import { API_URL } from "../../config.env.js";
 import { distance2Date } from "../utils/time.js";
 import { queryGen_T, resComicDetail_T, resComicItem_T } from "../utils/api.js";
+import { getDocumentByUrl, parseListGen3 } from "../utils/parser.js";
 
 // STUB: Naming rules
 // ...Url: include domain: "https://......./a/b/c"
@@ -14,6 +15,8 @@ import { queryGen_T, resComicDetail_T, resComicItem_T } from "../utils/api.js";
 // ...Slug: one part of Path: "a"
 // updatedAt: Date type
 // updatedDistance: Ex: 3 ngay truoc
+
+// TODO: Get page number and max_page in list
 
 const instance = axios.create({
   baseURL: API_URL,
@@ -23,20 +26,6 @@ const instance = axios.create({
 });
 
 class Model {
-  // static async getLogoUrl() {
-  //   try {
-  //     const { data } = await instance.get(API_URL);
-  //     const imageUrls = parseListGen(
-  //       data,
-  //       [{ selectorAll: ".logo > img", query: "src" }],
-  //       handleUrl
-  //     );
-  //     return imageUrls;
-  //   } catch (e) {
-  //     console.log(e);
-  //   }
-  // }
-
   static async RecentUpdate(page: number) {
     const { data } = await instance.get(`/?page=${page || 1}`);
     // writeFileSync("../../test.html", data);   // NOTE: Need to disable in production
@@ -73,7 +62,7 @@ class Model {
             selector: ".col-image  > img",
             attribute: "src",
             callback: (e: string) => {
-              return e.indexOf("http") === -1 ? "http" + e : e;
+              return e.indexOf("http:") === -1 ? "http:" + e : e;
             },
           },
           author: { selector: ".author > .col-xs-8", attribute: "" },
@@ -145,7 +134,7 @@ class Model {
           updatedDistance: result.chapterUpdatedDistance[i],
           updatedView: result.chapterViews[i],
         })),
-      }
+      };
     } catch (error: unknown) {
       if (error instanceof Error) console.log(error.message);
       else console.log(error);
@@ -233,14 +222,17 @@ class Model {
       else console.log(error);
     }
   }
-}
 
-// Model.RecentUpdate(1).then((data) => console.log(data));
-// --------------------------------------------------------------
-// --------------------------------------------------------------
-// --------------------------------------------------------------
-// getCommentInChapterPage("12345", 1).then((r) => console.log(r));
-// console.log(getComicIdBySlug('http://www.nettruyenpro.com/truyen-tranh/het-nhu-han-quang-gap-nang-gat-28247'))
+  // NOTE: Next model use paster.ts
+
+  static async getComicByName(name: string, page: number) {
+    const { data } = await instance.get(
+      `/tim-truyen?keyword=${name}${page ? `&page=${page}` : ""}`
+    );
+    const result = await getComicCard(data);
+    return result as resComicItem_T[];
+  }
+}
 
 // TODO: CHECK VALID SLUG
 function getComicIdBySlug(slug: string) {
@@ -261,8 +253,6 @@ async function getCommentInChapterPage(
       page || 1
     }`
   );
-  // console.log(data.response)
-  // console.log(data.pager)
 
   const pager = parseListGen(
     data.pager,

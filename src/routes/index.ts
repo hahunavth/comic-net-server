@@ -45,7 +45,6 @@ const Router = express.Router();
  */
 Router.get("/recently", paginate, Controller.getRecentUpdated);
 
-
 /**
  * @swagger
  * /top-comic/month:
@@ -60,7 +59,7 @@ Router.get("/recently", paginate, Controller.getRecentUpdated);
  *            schema:
  *              type: object
  */
-Router.get('/top-comic/month', Controller.getTopComicMonth)
+Router.get("/top-comic/month", Controller.getTopComicMonth);
 
 /**
  * @swagger
@@ -76,7 +75,7 @@ Router.get('/top-comic/month', Controller.getTopComicMonth)
  *            schema:
  *              type: object
  */
-Router.get('/home-comment', Controller.getHomeComment)
+Router.get("/home-comment", Controller.getHomeComment);
 
 /**
  * @swagger
@@ -181,7 +180,53 @@ Router.get("/comic-comment/:id", Controller.getComicComment);
 
 Router.get("/truyen-tranh/:id/:chapterId/:hash", Controller.getChapterPage);
 
+/**
+ * @swagger
+ * /find:
+ *   get:
+ *     summary: Retrieve comic details
+ *     description: Find comic by genres, max_chapter, ...
+ *     parameters:
+ *       - in: query
+ *         name: genders
+ *         required: true
+ *         description: endpoint path
+ *         schema:
+ *           type: string
+ *           example: 1
+ *     responses:
+ *       200:
+ *         description: A list of comics.
+ *         content:
+ *           application/json:
+ *            schema:
+ *              type: object
+ */
 Router.get("/find/", Controller.findComicPage);
+
+/**
+ * @swagger
+ * /find-by-name:
+ *   get:
+ *     summary: Retrieve comic details
+ *     description: Find comic by genres, max_chapter, ...
+ *     parameters:
+ *       - in: query
+ *         name: name
+ *         required: true
+ *         description: endpoint path
+ *         schema:
+ *           type: string
+ *           example: one
+ *     responses:
+ *       200:
+ *         description: A list of comics.
+ *         content:
+ *           application/json:
+ *            schema:
+ *              type: object
+ */
+Router.get("/find-by-name", paginate, Controller.findComicByName);
 
 /**
  * @swagger
@@ -211,8 +256,7 @@ Router.get("/find/", Controller.findComicPage);
  */
 
 Router.get("/cors/:proxyUrl*", Controller.corsAnywhere);
-Router.get("/cors", Controller.corsAnywhere);     // TODO: fix swagger can't use above route
-
+Router.get("/cors", Controller.corsAnywhere); // TODO: fix swagger can't use above route
 
 /**
  * @swagger
@@ -229,6 +273,5 @@ Router.get("/cors", Controller.corsAnywhere);     // TODO: fix swagger can't use
  *              type: object
  */
 Router.get("/test", Controller.test);
-
 
 export default Router;
