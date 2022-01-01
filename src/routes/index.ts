@@ -256,6 +256,7 @@ Router.get("/find-by-name", paginate, Controller.findComicByName);
  */
 
 Router.get("/cors/:proxyUrl*", Controller.corsAnywhere);
+
 Router.get("/cors", Controller.corsAnywhere); // TODO: fix swagger can't use above route
 
 /**
