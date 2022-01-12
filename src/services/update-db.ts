@@ -93,7 +93,7 @@ async function SaveData() {
 }
 
 export default function Task() {
-  cron.schedule("*/15 * * * *", () => {
+  cron.schedule("*/1 * * * *", () => {
     if (__lock === false) {
       findAndSaveComic();
     }
@@ -201,9 +201,12 @@ const crawlItem = async (comicItem: resComicItem_T) => {
       // });
       // console.log("object" + chapterDetailSaved);
       // if (!chapterDetailSaved) {
-      await chapterDetailInstance.save().then((a) => {
-        console.log("Save Chapter: " + a.comicPath);
-      });
+      await chapterDetailInstance
+        .save()
+        .then((a) => {
+          console.log("Save Chapter: " + a.comicPath);
+        })
+        .catch((e) => console.log(e));
       // } else {
       // console.log("Found chapter: " + chapterDetailSaved?.path);
       // }

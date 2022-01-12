@@ -9,6 +9,7 @@ const chapterDetailSchema = new mongoose.Schema<
 >(
   {
     _id: mongoose.Schema.Types.ObjectId,
+    path: String,
     title: String,
     comicPath: String,
     chapterName: String,
