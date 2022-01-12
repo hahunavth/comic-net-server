@@ -11,6 +11,11 @@ import cache from "./src/middleware/cache.js";
 import Router from "./src/routes/index.js";
 import { checkDotEnv } from "./src/utils/index.js";
 
+import mongoose from "mongoose";
+import Task from "./src/services/update-db.js";
+
+// import db from "./src/models/db";
+
 // import "./src/routes/books.js";
 
 const app = express();
@@ -36,17 +41,21 @@ const options = {
       },
       contact: {
         name: "NetCORS",
-        url: 'https://github.com/hahunavth',
-        email: 'vuthanhha.2001@gmail.com',
+        url: "https://github.com/hahunavth",
+        email: "vuthanhha.2001@gmail.com",
       },
     },
     servers: [
       {
-        url: SERVER_URL,    // NOTE: config in server
+        url: SERVER_URL, // NOTE: config in server
       },
     ],
   },
-  apis: ["./src/routes/index.ts", "./src/routes/index.js", './dist/src/models/index.js'],
+  apis: [
+    "./src/routes/index.ts",
+    "./src/routes/index.js",
+    "./dist/src/models/index.js",
+  ],
 };
 
 const specs = swaggerJsDoc(options);
@@ -62,13 +71,27 @@ app.use(
 app.get("/", (req, res) =>
   res.status(200).json({
     success: true,
-    message: "Server running in: " + SERVER_URL ,
-    info: "You can test api at: " + `https://hahunavth-express-api.heroku.com/docs`
+    message: "Server running in: " + SERVER_URL,
+    info:
+      "You can test api at: " + `https://hahunavth-express-api.heroku.com/docs`,
   })
 );
 
 app.use("/api/v1", Router);
 
-app.listen(PORT, () => {
-  console.log("🚀🚀🚀 Listening at http://localhost:" + PORT);
-});
+//  ANCHOR: DB
+
+async function main() {
+  console.log("🚀🚀🚀 START");
+  await mongoose.connect(
+    "mongodb+srv://hahunavth:vuha2001@cluster0.auw0z.mongodb.net/test"
+  );
+
+  Task();
+  console.log("🚀🚀🚀 Connect");
+  app.listen(PORT, () => {
+    console.log("🚀🚀🚀 Listening at http://localhost:" + PORT);
+  });
+}
+
+main().catch((err) => console.log(err));

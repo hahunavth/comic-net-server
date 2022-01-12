@@ -1,3 +1,5 @@
+import { FindComicProps } from "../../constants.js";
+import { resComicItem_T } from "../utils/api.js";
 declare class Model {
     static RecentUpdate(page: number): Promise<any>;
     static getTopComicMonth(): Promise<any>;
@@ -6,6 +8,7 @@ declare class Model {
     static getComicPage(path: string): Promise<{
         path: any;
         title: any;
+        author: any;
         posterUrl: any;
         status: any;
         kind: any;
@@ -16,12 +19,13 @@ declare class Model {
         detail: any;
         chapters: any;
     } | undefined>;
-    static FindComic(): Promise<any>;
+    static FindComic(param: FindComicProps): Promise<any>;
     static getChapterPage(path: string): Promise<any>;
     static getComicComment(path: string): Promise<{
         comment: any;
         pager: any;
     } | undefined>;
+    static getComicByName(name: string, page: number): Promise<resComicItem_T[]>;
 }
 export declare type queryOne_T = {
     selector?: string;

@@ -71,8 +71,8 @@ export type resComicDetailChapterItem_T = {
 // /truyen-tranh/{id}/{chapterId}/{hash}
 // ApiRespone_T<resChapterDetail_T>
 export type resChapterDetail_T = {
-  
   title: string;
+  path: string;
   chapterName: string;
   updatedAt: string;
   updatedDistance: string;

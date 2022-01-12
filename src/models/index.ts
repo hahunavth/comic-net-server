@@ -8,6 +8,7 @@ import { API_URL } from "../../config.env.js";
 import { distance2Date } from "../utils/time.js";
 import { queryGen_T, resComicDetail_T, resComicItem_T } from "../utils/api.js";
 import { getDocumentByUrl, parseListGen3 } from "../utils/parser.js";
+import RandomUseragent from "random-useragent";
 
 // STUB: Naming rules
 // ...Url: include domain: "https://......./a/b/c"
@@ -22,6 +23,7 @@ const instance = axios.create({
   baseURL: API_URL,
   headers: {
     Referer: API_URL,
+    useragent: RandomUseragent.getRandom(),
   },
 });
 
@@ -117,6 +119,7 @@ class Model {
       return {
         path: result.path,
         title: result.title,
+        author: result.author,
         posterUrl: result.posterUrl,
         status: result.status,
         kind: result.kind,

@@ -57,6 +57,7 @@ export declare type resComicDetailChapterItem_T = {
 };
 export declare type resChapterDetail_T = {
     title: string;
+    path: string;
     chapterName: string;
     updatedAt: string;
     updatedDistance: string;
