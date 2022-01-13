@@ -54,6 +54,7 @@ export declare type resComicDetailChapterItem_T = {
     path: string;
     updatedDistance: string;
     updatedVew: string;
+    "data-id": number;
 };
 export declare type resChapterDetail_T = {
     title: string;
