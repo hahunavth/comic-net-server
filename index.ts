@@ -83,12 +83,18 @@ app.use("/api/v1", Router);
 
 async function main() {
   console.log("🚀🚀🚀 START");
-  await mongoose.connect(
-    "mongodb+srv://hahunavth:vuha2001@cluster0.auw0z.mongodb.net/test"
-  );
+  console.log("🚀🚀🚀 Connect DB");
+  await mongoose
+    .connect(
+      `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.auw0z.mongodb.net/${process.env.DB_NAME}`
+    )
+    .then(() => console.log("Success!"))
+    .catch(() => console.log("Fail!!!"));
 
+  // Cron
   Task();
-  console.log("🚀🚀🚀 Connect");
+
+  // Express
   app.listen(PORT, () => {
     console.log("🚀🚀🚀 Listening at http://localhost:" + PORT);
   });

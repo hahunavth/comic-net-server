@@ -113,7 +113,7 @@ async function findAndSaveComic() {
   // return id === 2;
   // });
   // const comicPromiseList = new Array(3).fill(comicList).map(crawlItem);
-  let promises = comicList.map((comic) => limit(() => crawlItem(comic)));
+  const promises = comicList.map((comic) => limit(() => crawlItem(comic)));
   // Save comic detail
   await Promise.allSettled(promises);
   console.log("END");
@@ -148,11 +148,10 @@ const crawlItem = async (comicItem: resComicItem_T) => {
     const comicDetailSaved = await ComicDetails.findOne({
       path: comic.path,
     });
-    console.log("🚀🚀 - Found comic detail: " + comicDetailSaved?.path);
+    // console.log("🚀🚀 - Found comic detail: " + comicDetailSaved?.path);
     if (!comicDetailSaved) {
-      comicDetail
-        .save()
-        .then((cd) => console.log("🚀🚀 - Save comic detail: " + cd.path));
+      comicDetail.save();
+      // .then((cd) => console.log("🚀🚀 - Save comic detail: " + cd.path));
     }
 
     // Find chapters need save
@@ -166,21 +165,26 @@ const crawlItem = async (comicItem: resComicItem_T) => {
         comicPath: comicPagePath.path,
       });
     console.log(
-      "🚀🚀 - Find lasted chapter: " + savedLastedChapter?.chapterName
+      "🚀🚀 - Find lasted chapter: " + savedLastedChapter?.path,
+      comicPagePath.chapters[0].path
     );
+
     if (savedLastedChapter?.chapterName) {
-      console.log(_cptListLength);
+      // console.log(_cptListLength);
       for (let i = 0; i < _cptListLength; i++) {
-        if (_cptList[i].name === savedLastedChapter.chapterName) {
+        if (_cptList[i].path === savedLastedChapter.path) {
           _cptListPosition = i;
-          console.log("set " + i);
+          // console.log("set " + i + " " + savedLastedChapter.path);
           break;
         }
-        // console.log(_cptList[i].name);
       }
     }
+
     // Save chapterDetail
-    console.log("Fetch chapter from: " + _cptListPosition);
+    console.log(
+      "Fetch chapter from: " +
+        (_cptListPosition === -1 ? _cptListLength - 1 : _cptListPosition - 1)
+    );
     for (
       let i =
         _cptListPosition === -1 ? _cptListLength - 1 : _cptListPosition - 1;
@@ -189,34 +193,34 @@ const crawlItem = async (comicItem: resComicItem_T) => {
     ) {
       const chapterDetail = await Model.getChapterPage(_cptList[i]?.path);
       console.log("🚀🚀 - Fetch chapter: " + chapterDetail.path);
-      // console.log(chapterDetail);
       const chapterDetailInstance = new ChapterDetails({
         ...chapterDetail,
         _id: new mongoose.Types.ObjectId(),
         comicPath: comicPagePath.path,
       });
-      // if not found chapter -> save
-      // const chapterDetailSaved = await ChapterDetails.findOne({
-      // comicPath: comicItem.path,
-      // });
-      // console.log("object" + chapterDetailSaved);
-      // if (!chapterDetailSaved) {
-      await chapterDetailInstance
-        .save()
+
+      // Save to db
+      // await chapterDetailInstance
+      //   .save()
+      //   .then((a) => {
+      //     console.log("Save Chapter: " + a.comicPath);
+      //   })
+      //   .catch((e) => console.log("Save Chapter Fail:: ", e?.message));
+
+      await ChapterDetails.findOneAndUpdate(
+        { path: chapterDetail.path },
+        {
+          updatedAt: null,
+          updated_at: chapterDetail.updatedAt,
+          ...chapterDetail,
+          // _id: new mongoose.Types.ObjectId(),
+        },
+        { upsert: true }
+      )
         .then((a) => {
-          console.log("Save Chapter: " + a.comicPath);
+          console.log("Save Chapter: " + a?.comicPath);
         })
-        .catch((e) => console.log(e));
-      // } else {
-      // console.log("Found chapter: " + chapterDetailSaved?.path);
-      // }
+        .catch((e) => console.log("Save Chapter Fail::: ", e?.message));
     }
   }
-
-  // If not found -> save comic
-  // if (!result) {
-  //   console.log(`DB.SaveComic: ${comic.name}`);
-  //   comic.save().then((a) => console.log(a));
-  //   return;
-  // }
 };

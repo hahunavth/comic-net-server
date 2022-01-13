@@ -65,6 +65,7 @@ export type resComicDetailChapterItem_T = {
   path: string;
   updatedDistance: string;
   updatedVew: string; // NOTE: api forgot name
+  "data-id": number;
 };
 
 // "https://hahunavth-express-api.herokuapp.com/api/v1/" + path.path

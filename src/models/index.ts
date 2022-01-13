@@ -82,6 +82,10 @@ class Model {
             selectorAll: "nav > ul > .row > .chapter > a",
             attribute: "",
           },
+          chapterDataIds: {
+            selectorAll: "nav > ul > .row > .chapter > a",
+            attribute: "data-id",
+          },
           chapterUrls: {
             selectorAll: "nav > ul > .row > .chapter > a",
             attribute: "href",
@@ -136,6 +140,7 @@ class Model {
           path: result.chapterPaths[i],
           updatedDistance: result.chapterUpdatedDistance[i],
           updatedView: result.chapterViews[i],
+          "data-id": result.chapterDataIds[i],
         })),
       };
     } catch (error: unknown) {
