@@ -5,6 +5,7 @@ const chapterDetailSchema = new mongoose.Schema<
   resChapterDetail_T & {
     _id: string;
     comicPath: string;
+    updated_at: string;
   }
 >(
   {
@@ -13,9 +14,10 @@ const chapterDetailSchema = new mongoose.Schema<
     title: String,
     comicPath: String,
     chapterName: String,
-    updatedAt: String,
+    // updatedAt: String,
     updatedDistance: String,
     images: [String],
+    updated_at: String,
     // chapters: resComicDetailChapterItem_T[];
     // chapters: [{ type: mongoose.Schema.Types.ObjectId, ref: "Chapter" }],
   },
