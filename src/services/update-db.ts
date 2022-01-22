@@ -7,35 +7,35 @@ import { getComicSlug } from "../utils/index.js";
 import { resComicDetailChapterItem_T, resComicItem_T } from "../utils/api.js";
 import ComicDetails from "../models/comicDetails.js";
 import pLimit from "p-limit";
+import ComicLog, { ComicLogT } from "../models/comicLog.js";
+
 import chalk from "chalk";
 import DraftLog from "draftlog";
 DraftLog(console);
 
 let _lock = false;
-let _fetchListStt: {
-  path: string;
-  max: number;
-  from: number;
-  to: number;
-  sucCount: number;
-  errCount: number;
-}[] = [];
+let _fetchListStt: ComicLogT[] = [];
 
 export default function Task() {
   cron.schedule("*/10 * * * *", () => {
     if (_lock === false) {
-      findAndSaveComic();
+      findAndSaveComic(1);
     }
   });
-  findAndSaveComic();
+  (async () => {
+    //   for (let i = 100; i > 0; i--) {
+    //     await findAndSaveComic(i);
+    //   }
+    await findAndSaveComic(1);
+  })();
 }
 
 // SaveData();
-const limit = pLimit(1);
-async function findAndSaveComic() {
+const limit = pLimit(6);
+async function findAndSaveComic(page: number) {
   _lock = true;
   // Get recent list in first page
-  const comicList: any[] = await Model.RecentUpdate(1);
+  const comicList: any[] = await Model.RecentUpdate(page);
   console.log(`🚀🚀 - Fetch comic list: ${comicList.length}`);
 
   const promises = comicList.map((comic) => limit(() => crawlItem(comic)));
@@ -123,6 +123,18 @@ const crawlItem = async (comicItem: resComicItem_T) => {
         }
       }
     }
+
+    // init log
+    const comicLog: ComicLogT = {
+      _id: new mongoose.Types.ObjectId(),
+      max: _cptListLength,
+      from: _cptListPosition,
+      to: 0,
+      path: comic.path || "",
+      errCount: 0,
+      sucCount: 0,
+      errPaths: [],
+    };
     // draftCptStt(
     //   "CptStatus:",
     //   chalk.green(`All: ${_cptListLength}`),
@@ -197,9 +209,13 @@ const crawlItem = async (comicItem: resComicItem_T) => {
         { upsert: true, new: true }
       )
         .then((a) => {
-          // console.log("Save Chapter: " + a?.path + " " + chapterDetail.path);
+          comicLog.sucCount++;
         })
-        .catch((err) => console.log("Save Chapter Fail::: ", err?.message));
+        .catch((err) => {
+          comicLog.errCount++;
+          comicLog.errPaths.push(chapterDetail.path);
+          console.log("Save Chapter Fail::: ", err?.message);
+        });
     }
 
     // draftCptStt(
@@ -215,5 +231,8 @@ const crawlItem = async (comicItem: resComicItem_T) => {
     //   )
     // );
     // draftCpt("Chapter:", chalk.blue("Done!"));
+
+    const newComicLog = new ComicLog(comicLog);
+    if (comicLog.from) newComicLog.save();
   }
 };
