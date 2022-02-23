@@ -202,7 +202,7 @@ Router.get("/truyen-tranh/:id/:chapterId/:hash", Controller.getChapterPage);
  *            schema:
  *              type: object
  */
-Router.get("/find/", Controller.findComicPage);
+Router.get("/find/", paginate, Controller.findComicPage);
 
 /**
  * @swagger

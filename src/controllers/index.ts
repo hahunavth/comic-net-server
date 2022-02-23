@@ -145,6 +145,7 @@ class Controller {
       const params: {
         [k in keyof FindComicProps]?: any;
       } = req.query;
+      const { pagination, page, limit, offset } = res.locals;
 
       const result = await Model.FindComic({
         gender: params.gender,
@@ -152,6 +153,7 @@ class Controller {
         minchapter: params.minchapter,
         sort: params.sort,
         status: params.status,
+        page,
       });
       return res.status(200).json({ data: (result && result[0]) || [] });
     } catch (error) {
@@ -159,6 +161,7 @@ class Controller {
     }
   }
 
+  // TODO: PAGINATE RESPONSE
   static async getChapterPage(req: Request, res: Response, next: NextFunction) {
     try {
       // console.log(req.path);

@@ -152,7 +152,9 @@ class Model {
   static async FindComic(param: FindComicProps) {
     try {
       const { data } = await instance.get(
-        `/tim-truyen-nang-cao?genres=${param.genres}&nogenres=&gender=${param.gender}&status=${param.status}&sort=${param.sort}`
+        `/tim-truyen-nang-cao?genres=${param.genres}&nogenres=&gender=${
+          param.gender
+        }&status=${param.status}&sort=${param.sort}&page=${param.page || 1}`
       );
       return getComicCard(data);
     } catch (error: unknown) {

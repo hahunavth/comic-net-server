@@ -63,49 +63,47 @@ export const GENRES_LIST = [
 ];
 
 // minchapter=50
-export const NUM_CHAPTER = [
-0, 50, 100, 200, 300, 400, 500
-]
+export const NUM_CHAPTER = [0, 50, 100, 200, 300, 400, 500];
 
 type KV = {
   key: number;
   value: string;
-}
+};
 // status=2
 export const STATUS: KV[] = [
-  {key: -1, value: 'All'},
-  {key: 1, value: 'Ogging'},
-  {key: 2, value: 'Completed'},
-]
+  { key: -1, value: "All" },
+  { key: 1, value: "Ogging" },
+  { key: 2, value: "Completed" },
+];
 
 // gender=-1
-export const FOR_USER : KV[]= [
-  {key: 2, value: 'Male'},
-  {key: 1, value: 'Female'},
-  {key: -1, value: 'All'}
-]
+export const FOR_USER: KV[] = [
+  { key: 2, value: "Male" },
+  { key: 1, value: "Female" },
+  { key: -1, value: "All" },
+];
 // sort=5
 export const SORT_BY: KV[] = [
-  {key: 0, value: 'New Chapter'},
-  {key: 5, value: 'Alphabet'},
-  {key: 10, value: 'Most Viewer'},
-  {key: 11, value: 'Most Viewer In Month'},
-  {key: 12, value: 'Most Viewer In Week'},
-  {key: 13, value: 'Most Viewer In Today'},
-  {key: 15, value: 'New Comic'},
-  {key: 20, value: 'Most Subcribe'},
-  {key: 25, value: 'Most Comment'},
-  {key: 30, value: 'Most Chapter'},
-]
-
+  { key: 0, value: "New Chapter" },
+  { key: 5, value: "Alphabet" },
+  { key: 10, value: "Most Viewer" },
+  { key: 11, value: "Most Viewer In Month" },
+  { key: 12, value: "Most Viewer In Week" },
+  { key: 13, value: "Most Viewer In Today" },
+  { key: 15, value: "New Comic" },
+  { key: 20, value: "Most Subcribe" },
+  { key: 25, value: "Most Comment" },
+  { key: 30, value: "Most Chapter" },
+];
 
 export type FindComicProps = {
-  genres: number,
-  minchapter: number,
-  status: number,
-  gender: number,
-  sort: number
-}
+  genres: number;
+  minchapter: number;
+  status: number;
+  gender: number;
+  sort: number;
+  page?: number;
+};
 
 export function toIdList(ids: number[]) {
   return ids.reduce((prev, id) => prev + id, "");
