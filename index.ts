@@ -2,7 +2,6 @@ import { API_URL, PORT, SERVER_URL } from "./config.env.js";
 import express from "express";
 import cors from "cors";
 import logger from "morgan";
-// import bodyParser from "body-parser";
 import swaggerJsDoc from "swagger-jsdoc";
 import swaggerUiExpress from "swagger-ui-express";
 
@@ -13,10 +12,6 @@ import { checkDotEnv } from "./src/utils/index.js";
 
 import mongoose from "mongoose";
 import Task from "./src/services/update-db.js";
-
-// import db from "./src/models/db";
-
-// import "./src/routes/books.js";
 
 const app = express();
 
@@ -91,8 +86,10 @@ async function main() {
     .then(() => console.log("Success!"))
     .catch(() => console.log("Fail!!!"));
 
-  // Cron
-  Task();
+  // Cron task
+  // NOTE: Disable for development
+  // TODO: Find solution for save data online without quota
+  // Task();
 
   // Express
   app.listen(PORT, () => {

@@ -32,16 +32,17 @@ class Controller {
     try {
       const { pagination, page, limit, offset } = res.locals;
 
-      const list = await Model.RecentUpdate(page);
+      const result = await Model.RecentUpdate(page);
+      // console.log(result?.pagination)
 
-      console.log(list?.length);
       res.status(200).json({
         success: true,
         pagination: {
-          page,
+          page: result?.pagination.page || page,
           limit,
+          max: result?.pagination?.max || -1
         },
-        data: list,
+        data: result?.list || [],
       });
     } catch (error) {
       next(error);
@@ -90,17 +91,19 @@ class Controller {
 
   static async getHotPage(req: Request, res: Response, next: NextFunction) {
     try {
-      const { page } = res.locals;
+      const { page, limit, offset } = res.locals;
       // const { offset } = pageToPagination(_page);
 
-      const list = await Model.getHotPage(page);
+      const result = await Model.getHotPage(page);
 
       res.status(200).json({
         success: true,
         pagination: {
-          // page, limit
+          page: result?.pagination.page || page,
+          limit,
+          max: result?.pagination?.max || -1
         },
-        data: list,
+        data: result?.list,
       });
     } catch (error) {
       next(error);
@@ -155,7 +158,12 @@ class Controller {
         status: params.status,
         page,
       });
-      return res.status(200).json({ data: (result && result[0]) || [] });
+      return res.status(200)
+      .json({
+        pagination: result?.pagination,
+        // FIXME: fix array
+        data: result?.list[0] || [],
+       });
     } catch (error) {
       next(error);
     }
@@ -182,7 +190,7 @@ class Controller {
       const { pagination, page, limit, offset } = res.locals;
 
       if (typeof name === "string") {
-        const list = await Model.getComicByName(name, page);
+        const result = await Model.getComicByName(name, page);
         return res.status(200).json({
           success: true,
           pagination: {
@@ -190,8 +198,10 @@ class Controller {
             page,
             limit,
             offset,
+            ...result?.pagination
           },
-          data: list,
+          // FIXME: fix array
+          data: result?.list[0],
         });
       }
       res.status(400).json({

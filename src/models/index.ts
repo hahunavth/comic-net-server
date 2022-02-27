@@ -26,13 +26,16 @@ const instance = axios.create({
     useragent: RandomUseragent.getRandom(),
   },
 });
-
+/**
+  * Fetch data model
+  */
 class Model {
   static async RecentUpdate(page: number) {
     const { data } = await instance.get(`/?page=${page || 1}`);
     // writeFileSync("../../test.html", data);   // NOTE: Need to disable in production
     const result = await getComicCard(data);
-    return result && result[0];
+
+    return result;
   }
 
   static async getTopComicMonth() {
@@ -50,7 +53,7 @@ class Model {
   static async getHotPage(page?: number) {
     const { data } = await instance.get(`/hot?${page || 1}`);
     const result = await getComicCard(data);
-    return result && result[0];
+    return result;
   }
 
   static async getComicPage(path: string) {
@@ -156,7 +159,7 @@ class Model {
           param.gender
         }&status=${param.status}&sort=${param.sort}&page=${param.page || 1}`
       );
-      return getComicCard(data);
+      return await getComicCard(data);
     } catch (error: unknown) {
       if (error instanceof Error) console.log(error.message);
       else console.log(error);
@@ -240,9 +243,13 @@ class Model {
       `/tim-truyen?keyword=${name}${page ? `&page=${page}` : ""}`
     );
     const result = await getComicCard(data);
-    return result as resComicItem_T[];
+    return result;
   }
 }
+
+/**
+  * Helper function
+  */
 
 // TODO: CHECK VALID SLUG
 function getComicIdBySlug(slug: string) {
@@ -391,6 +398,11 @@ async function getTopList(data: string) {
   );
   return list;
 }
+
+type Paginate = {
+  page: number | string,
+  max: number | string,
+}
 // get comic card info (homePage, findPage)
 async function getComicCard(data: string) {
   try {
@@ -478,7 +490,38 @@ async function getComicCard(data: string) {
       }
     );
 
-    return list;
+    const pager = parseListGen(data,
+      {
+        pagination: {
+          selector: ".pagination",
+          attribute: "",
+          callback: (r: string) => {
+            const info = r
+              .trim()
+              .slice(r.trim().indexOf(" "), r.trim().indexOf("«"))
+              .trim()
+              .split(" ")
+              .filter((s) => s !== "/");
+
+            return {
+              page: info[0],
+              max: info[1],
+            };
+          },
+        },
+      },
+      (e: Element, attr: string) => {
+        if (!attr) return e.textContent || "";
+        else {
+          return e.getAttribute(attr);
+        }
+      }
+    )
+
+    return {
+      list: list as resComicItem_T[],
+      pagination: pager.pagination as Paginate,
+    };
   } catch (error: unknown) {
     if (error instanceof Error) console.log(error.message);
     else console.log(error);
@@ -532,7 +575,7 @@ export type queryO_T = {
 export type queryA_T = queryOne_T[];
 type gCallback_T = (a: any, b: any, c?: any, d?: any) => any;
 
-// TODO: Need refactor
+// TODO: Refactor for typecheck
 export function parseListGen(
   html: string,
   query: queryO_T | queryA_T,
