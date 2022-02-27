@@ -35,7 +35,8 @@ const limit = pLimit(6);
 async function findAndSaveComic(page: number) {
   _lock = true;
   // Get recent list in first page
-  const comicList: any[] = await Model.RecentUpdate(page);
+  const result = await Model.RecentUpdate(page);
+  const comicList: any[] = result?.list || []
   console.log(`🚀🚀 - Fetch comic list: ${comicList.length}`);
 
   const promises = comicList.map((comic) => limit(() => crawlItem(comic)));
