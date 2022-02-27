@@ -161,8 +161,7 @@ class Controller {
       return res.status(200)
       .json({
         pagination: result?.pagination,
-        // FIXME: fix array
-        data: result?.list[0] || [],
+        data: result?.list || [],
        });
     } catch (error) {
       next(error);
@@ -200,8 +199,7 @@ class Controller {
             offset,
             ...result?.pagination
           },
-          // FIXME: fix array
-          data: result?.list[0],
+          data: result?.list,
         });
       }
       res.status(400).json({

@@ -519,7 +519,7 @@ async function getComicCard(data: string) {
     )
 
     return {
-      list: list as resComicItem_T[],
+      list: list ? list[0] : [] as resComicItem_T[],
       pagination: pager.pagination as Paginate,
     };
   } catch (error: unknown) {
