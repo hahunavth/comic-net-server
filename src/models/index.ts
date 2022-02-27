@@ -504,8 +504,8 @@ async function getComicCard(data: string) {
               .filter((s) => s !== "/");
 
             return {
-              page: info[0],
-              max: info[1],
+              page: typeof info[0] === 'string' ? Number.parseInt(info[0]) : info[0],
+              max: typeof info[1] === 'string' ? Number.parseInt(info[1]) : info[1],
             };
           },
         },
