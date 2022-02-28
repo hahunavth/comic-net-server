@@ -1,5 +1,7 @@
 # Nettruyen CORS Api
-
+### Status
+![example workflow](https://github.com/hahunavth/comic-net-server/actions/workflows/main.yml/badge.svg)
+![example workflow](https://github.com/hahunavth/comic-net-server/actions/workflows/codeql-analysis.yml/badge.svg)
 ### Screenshot
 
 ![image info](./Screenshot.png)
