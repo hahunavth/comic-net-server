@@ -55,6 +55,7 @@ class Controller {
     next: NextFunction
   ) {
     try {
+      // dont need pagination
       // const { pagination, page, limit, offset } = res.locals;
 
       const list = await Model.getTopComicMonth();
@@ -162,6 +163,7 @@ class Controller {
       .json({
         pagination: result?.pagination,
         data: result?.list || [],
+        success: true
        });
     } catch (error) {
       next(error);

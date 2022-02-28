@@ -7,12 +7,45 @@
 // let server = require('../server');
 // let should = chai.should();
 
-import chai from 'chai'
+import chai, { expect } from 'chai'
 import chaiHttp from 'chai-http'
 import app from '../../index.js'
 let should = chai.should();
 
 chai.use(chaiHttp);
+
+const EndResComicItem = function (done: any) {
+  return (err: any, res: any) => {
+    const body = res.body;
+      res.should.have.status(200);
+      res.body.should.be.a('object');
+      res.body.should.have.property('data')
+        .with.length.greaterThanOrEqual(1)
+        // .with.lengthOf(36);
+      res.body.data.every((i: any) => {
+        expect(i).to.have.property('name').with.be.a('string');
+        expect(i).to.have.property('status').with.be.a('string');
+        expect(i).to.have.property('views').with.be.a('string');
+        expect(i).to.have.property('follows').with.be.a('string');
+        expect(i).to.have.property('updatedDistance').with.be.a('string');
+        expect(i).to.have.property('updatedAt').with.be.a('string');
+        expect(i).to.have.property('posterUrl').with.be.a('string');
+        expect(i).to.have.property('path').with.be.a('string');
+        expect(i).to.have.property('id').with.be.a('string');
+        expect(i).to.have.property('posterUrl').with.be.a('string');
+        expect(i).to.have.property('kind').with.be.a('array').with.length.greaterThanOrEqual(1);
+        expect(i).to.have.property('lastedChapters').with.be.a('array').with.lengthOf(3);
+        // expect(i).to.have.property('name');
+      })
+      // res.body.data.every((i: any) => expect(i).to.have.property('name').with.key('a'))
+      res.body.should.have.property('pagination');
+      res.body.pagination.should.have.property('max').with.be.a('number').to.greaterThanOrEqual(1);
+      res.body.pagination.should.have.property('page').with.be.a('number').to.equal(2);
+      res.body.should.have.property('success').to.equal(true);
+      done();
+  }
+}
+
 //Our parent block
 describe('Comic list', () => {
     beforeEach((done) => {
@@ -26,18 +59,7 @@ describe('Comic list', () => {
         it('it should GET all the comic', (done) => {
             chai.request(app)
                 .get('/api/v1/recently?page=2')
-                .end((err, res) => {
-                    res.should.have.status(200);
-                    res.body.should.be.a('object');
-                    res.body.should.have.property('data').with.lengthOf(36);
-                    res.body.should.have.property('pagination');
-                    res.body.pagination.should.be.a('object');
-                    res.body.pagination.should.have.property('max');
-                    res.body.should.have.property('success').to.equal(true);
-                    // res.should.have.property('data')
-                    // res.body.length.should.be.eql(9); // fixme :)
-                    done();
-                });
+                .end(EndResComicItem(done));
         });
         // it('it should have pagination', (done) => {
         //   chai.request(app)
@@ -55,15 +77,26 @@ describe('Comic list', () => {
     describe('/GET hot', () => {
         it('it should GET all the comic', (done) => {
             chai.request(app)
-                .get('/api/v1/hot')
-                .end((err, res) => {
-                    res.should.have.status(200);
-                    res.body.should.be.a('object');
-                    res.body.should.have.property('data').with.lengthOf(36);
-                    res.body.should.have.property('pagination');
-                    res.body.should.have.property('success').to.equal(true);
-                    done();
-                });
+                .get('/api/v1/hot?page=2')
+                .end(EndResComicItem(done));
+        });
+    });
+
+    //
+    describe('/GET find', () => {
+        it('it should GET all the comic', (done) => {
+            chai.request(app)
+                .get('/api/v1/find?genders=1&page=2')
+                .end(EndResComicItem(done));
+        });
+    });
+
+    //
+    describe('/GET find-by-name', () => {
+        it('it should GET all the comic', (done) => {
+            chai.request(app)
+                .get('/api/v1/find-by-name?name=one&page=2')
+                .end(EndResComicItem(done));
         });
     });
 

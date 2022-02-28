@@ -51,7 +51,7 @@ class Model {
   }
 
   static async getHotPage(page?: number) {
-    const { data } = await instance.get(`/hot?${page || 1}`);
+    const { data } = await instance.get(`/hot?page=${page || 1}`);
     const result = await getComicCard(data);
     return result;
   }

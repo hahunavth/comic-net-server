@@ -58,6 +58,6 @@
     "watch-ts": "tsc -w",
     "deploy": "git add . && git commit -m Heroku && git push heroku master",
     "dev": "nodemon --watch './**/*.ts' --exec 'node --loader ts-node/esm ' index.ts ",
-    "test": "NODE_ENV=test node ./node_modules/mocha/bin/mocha --loader=ts-node/esm --extension ts ./src/tests/*.ts --exit"
+    "test": "NODE_ENV=test node ./node_modules/mocha/bin/mocha --loader=ts-node/esm --extension ts ./src/tests/*.ts --exit --timeout 15000"
   }
 }
