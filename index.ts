@@ -17,7 +17,8 @@ const app = express();
 
 app.use(cors());
 app.use(cache());
-app.use(logger("dev"));
+if(process.env.NODE_ENV !== 'test')
+  app.use(logger("dev"));
 app.use(errorHandler);
 app.use(express.json());
 
@@ -97,4 +98,9 @@ async function main() {
   });
 }
 
-main().catch((err) => console.log(err));
+// RUN APPLICATION IF NOT ENV IS NOT TESTING
+if(process.env.NODE_ENV !== 'test')
+  main().catch((err) => console.log(err));
+
+// For testing
+export default app;

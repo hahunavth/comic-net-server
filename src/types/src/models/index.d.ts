@@ -1,10 +1,18 @@
 import { FindComicProps } from "../../constants.js";
-import { resComicItem_T } from "../utils/api.js";
+/**
+  * Fetch data model
+  */
 declare class Model {
-    static RecentUpdate(page: number): Promise<any>;
+    static RecentUpdate(page: number): Promise<{
+        list: any;
+        pagination: Paginate;
+    } | undefined>;
     static getTopComicMonth(): Promise<any>;
     static getHomeComment(): Promise<any>;
-    static getHotPage(page?: number): Promise<any>;
+    static getHotPage(page?: number): Promise<{
+        list: any;
+        pagination: Paginate;
+    } | undefined>;
     static getComicPage(path: string): Promise<{
         path: any;
         title: any;
@@ -19,14 +27,24 @@ declare class Model {
         detail: any;
         chapters: any;
     } | undefined>;
-    static FindComic(param: FindComicProps): Promise<any>;
+    static FindComic(param: FindComicProps): Promise<{
+        list: any;
+        pagination: Paginate;
+    } | undefined>;
     static getChapterPage(path: string): Promise<any>;
     static getComicComment(path: string): Promise<{
         comment: any;
         pager: any;
     } | undefined>;
-    static getComicByName(name: string, page: number): Promise<resComicItem_T[]>;
+    static getComicByName(name: string, page: number): Promise<{
+        list: any;
+        pagination: Paginate;
+    } | undefined>;
 }
+declare type Paginate = {
+    page: number | string;
+    max: number | string;
+};
 export declare type queryOne_T = {
     selector?: string;
     selectorAll?: string;

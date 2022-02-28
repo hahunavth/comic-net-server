@@ -21,6 +21,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: tests
+      run: yarn && yarn test
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v2
       with:
@@ -33,4 +35,3 @@ jobs:
         DB_USERNAME: ${{secrets.DB_USERNAME}}
         PORT: ${{secrets.PORT}}
         SERVER_URL: ${{secrets.SERVER_URL}}
-        

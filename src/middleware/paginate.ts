@@ -29,7 +29,7 @@ export default function paginate(
           typeof limit === "string" ? limit : ""
         ),
       };
-      console.log(res.locals);
+      // console.log(res.locals);
     }
 
     next();

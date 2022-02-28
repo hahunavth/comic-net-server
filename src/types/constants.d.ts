@@ -14,6 +14,7 @@ export declare type FindComicProps = {
     status: number;
     gender: number;
     sort: number;
+    page?: number;
 };
 export declare function toIdList(ids: number[]): string;
 export {};
