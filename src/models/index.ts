@@ -9,6 +9,7 @@ import { distance2Date } from "../utils/time.js";
 import { queryGen_T, resComicDetail_T, resComicItem_T } from "../utils/api.js";
 import { getDocumentByUrl, parseListGen3 } from "../utils/parser.js";
 import RandomUseragent from "random-useragent";
+import { getPathFromUrl } from "../utils/index.js";
 
 // STUB: Naming rules
 // ...Url: include domain: "https://......./a/b/c"
@@ -27,8 +28,8 @@ const instance = axios.create({
   },
 });
 /**
-  * Fetch data model
-  */
+ * Fetch data model
+ */
 class Model {
   static async RecentUpdate(page: number) {
     const { data } = await instance.get(`/?page=${page || 1}`);
@@ -96,7 +97,11 @@ class Model {
           chapterPaths: {
             selectorAll: "nav > ul > .row > .chapter > a",
             attribute: "href",
-            callback: (l) => l.map((e: string) => e.replace(API_URL, "")),
+            callback: (l) =>
+              l.map((e: string) =>
+                // e.replace(API_URL, "")
+                getPathFromUrl(e)
+              ),
           },
           chapterUpdatedDistance: {
             selectorAll: "li > .col-xs-4.text-center.small",
@@ -248,8 +253,8 @@ class Model {
 }
 
 /**
-  * Helper function
-  */
+ * Helper function
+ */
 
 // TODO: CHECK VALID SLUG
 function getComicIdBySlug(slug: string) {
@@ -354,10 +359,11 @@ async function getNewComment(data: string) {
     (e: HTMLElement) => {
       return {
         name: e.querySelector("h3 > a")?.textContent,
-        path: e
-          .querySelector("h3 > a")
-          ?.getAttribute("href")
-          ?.replace("http://www.nettruyenpro.com", ""),
+        path: getPathFromUrl(e.querySelector("h3 > a")?.getAttribute("href")),
+        // e
+        //   .querySelector("h3 > a")
+        //   ?.getAttribute("href")
+        // ?.replace("http://www.nettruyenpro.com", ""),
         url: e.querySelector("h3 > a")?.getAttribute("href"),
         authorName: e.querySelector("a > span")?.textContent,
         date: e.querySelector("abbr")?.getAttribute("title"),
@@ -400,9 +406,9 @@ async function getTopList(data: string) {
 }
 
 type Paginate = {
-  page: number | string,
-  max: number | string,
-}
+  page: number | string;
+  max: number | string;
+};
 // get comic card info (homePage, findPage)
 async function getComicCard(data: string) {
   try {
@@ -465,8 +471,8 @@ async function getComicCard(data: string) {
             result.posterUrl = "http:" + result.posterUrl;
           }
           result.path =
-            e.querySelector("a")?.getAttribute("href")?.replace(API_URL, "") ||
-            null;
+            // e.querySelector("a")?.getAttribute("href")?.replace(API_URL, "") ||
+            getPathFromUrl(e.querySelector("a")?.getAttribute("href")) || null;
           result.id = result.path;
 
           const e2 = e.querySelectorAll(
@@ -490,7 +496,8 @@ async function getComicCard(data: string) {
       }
     );
 
-    const pager = parseListGen(data,
+    const pager = parseListGen(
+      data,
       {
         pagination: {
           selector: ".pagination",
@@ -504,8 +511,14 @@ async function getComicCard(data: string) {
               .filter((s) => s !== "/");
 
             return {
-              page: typeof info[0] === 'string' ? Number.parseInt(info[0]) : info[0],
-              max: typeof info[1] === 'string' ? Number.parseInt(info[1]) : info[1],
+              page:
+                typeof info[0] === "string"
+                  ? Number.parseInt(info[0])
+                  : info[0],
+              max:
+                typeof info[1] === "string"
+                  ? Number.parseInt(info[1])
+                  : info[1],
             };
           },
         },
@@ -516,10 +529,10 @@ async function getComicCard(data: string) {
           return e.getAttribute(attr);
         }
       }
-    )
+    );
 
     return {
-      list: list ? list[0] : [] as resComicItem_T[],
+      list: list ? list[0] : ([] as resComicItem_T[]),
       pagination: pager.pagination as Paginate,
     };
   } catch (error: unknown) {
@@ -545,7 +558,8 @@ function parseList(html: string) {
 // callback for parseListGen
 function handleUrl(element: HTMLElement, attribute: string) {
   const str = element.getAttribute(attribute);
-  return str && str.replace("http://www.nettruyenpro.com", "");
+  // return str && str.replace("http://www.nettruyenpro.com", "");
+  return str && getPathFromUrl(str);
 }
 
 /*

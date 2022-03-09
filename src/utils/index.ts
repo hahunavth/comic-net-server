@@ -38,3 +38,14 @@ export function getChapterSlug(path: string) {
   console.warn(`Path is not valid: ${path}`);
   return null;
 }
+
+/**
+ * getPathFromUrl with any domain
+ * @param url
+ * @returns
+ *
+ * @example: http://abc.domain.com/slug/slug2 -> /slug/slug2
+ */
+export function getPathFromUrl(url?: string | null) {
+  return url?.replace(/^.*\/\/[^\/]+/, "");
+}
