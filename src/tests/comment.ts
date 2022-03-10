@@ -36,5 +36,26 @@ describe("Comment", () => {
           done();
         });
     });
+
+    it("it should have avatarUrl begin with https://", (done) => {
+      chai
+        .request(app)
+        .get(
+          "/api/v1/comic-comment/monster-ga-afureru-sekai-ni-natta-node-suki-ni-ikitai-to-omoimasu-25132?page=3"
+        )
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.be.a("object");
+          res.body.should.have.property("data").with.be.a("array");
+          res.body.data.every((i: any) => {
+            expect(i)
+              .to.have.property("avatarUrl")
+              .with.be.a("string")
+              .match(/^https:\/\//g);
+            expect(i).to.have.property("chapterName").with.be.a("string");
+          });
+          done();
+        });
+    });
   });
 });

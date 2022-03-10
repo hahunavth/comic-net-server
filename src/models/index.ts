@@ -322,23 +322,32 @@ async function getCommentInChapterPage(
       },
     },
     (e: Element, attr: string, query, i) => {
-      if (i === "res")
+      if (i === "res") {
+        // DONE: Validate link, Ex:  avatarUrl: '//s.nettruyenpro.com/Data/SiteImages/anonymous.png',
+        let avatarUrl = e?.querySelector(".author > img")?.getAttribute("src");
+        if (avatarUrl?.startsWith("//")) avatarUrl = "https:" + avatarUrl;
+
         return {
           id: e?.getAttribute("id"),
           username: e?.querySelector(".authorname")?.textContent,
           role: e?.querySelector(".member")?.textContent,
-          avatarUrl: e?.querySelector(".author > img")?.getAttribute("src"), // TODO: Validate link, Ex:  avatarUrl: '//s.nettruyenpro.com/Data/SiteImages/anonymous.png',
+          avatarUrl,
           abbr: e?.querySelector("abbr")?.getAttribute("title"),
           datednf: e?.querySelector("abbr")?.textContent?.trim(),
           chapterName: e?.querySelector(".cmchapter")?.textContent, // NOTE: Can be undefined in src
           content: e.querySelector(".summary")?.textContent,
 
           reply: [...e.querySelectorAll(".jcmt > li:not([class])")].map((e) => {
+            let avatarUrl = e
+              ?.querySelector(".author > img")
+              ?.getAttribute("src");
+            if (avatarUrl?.startsWith("//")) avatarUrl = "https:" + avatarUrl;
+
             return {
               id: e?.getAttribute("id"),
               username: e?.querySelector(".authorname")?.textContent,
               role: e?.querySelector(".member")?.textContent,
-              avatarUrl: e?.querySelector(".author > img")?.getAttribute("src"), // TODO: Validate link, Ex:  avatarUrl: '//s.nettruyenpro.com/Data/SiteImages/anonymous.png',
+              avatarUrl, // TODO: Validate link, Ex:  avatarUrl: '//s.nettruyenpro.com/Data/SiteImages/anonymous.png',
               abbr: e?.querySelector("abbr")?.getAttribute("title"),
               datednf: e?.querySelector("abbr")?.textContent?.trim(),
               chapterName: e?.querySelector(".cmchapter")?.textContent, // NOTE: Can be undefined in src
@@ -346,6 +355,7 @@ async function getCommentInChapterPage(
             };
           }),
         };
+      }
       if (!attr) return e.textContent || "";
       else {
         return e.getAttribute(attr);
