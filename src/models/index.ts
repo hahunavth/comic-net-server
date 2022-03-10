@@ -288,12 +288,12 @@ async function getCommentInChapterPage(
             .split(" ")
             .filter((s) => s !== "of");
           return {
-            current: info[0],
-            max: info[1],
+            current: Number.parseInt(info[0], 10),
+            max: Number.parseInt(info[1], 10),
           };
         },
       },
-      // FIXME: count = null
+      // FIXME: count = null and convert to number
       count: {
         selector: ".nav-tabs",
         attribute: "",

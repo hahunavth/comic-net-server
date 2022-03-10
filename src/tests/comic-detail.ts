@@ -56,12 +56,12 @@ const ItComicDetail = (done: any) => {
 
 describe("Comic Detail", () => {
   beforeEach((done) => {
-    //Before each test we empty the database in your case
+    // Before each test we empty the database in your case
     done();
   });
 
   describe("/GET truyen-tranh/{id}", () => {
-    it("it should GET comic detail infomation", (done) => {
+    it("it should GET comic detail information", (done) => {
       ItComicDetail(done);
     });
   });

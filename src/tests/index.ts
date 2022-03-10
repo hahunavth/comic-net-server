@@ -10,6 +10,7 @@
 import chai, { expect } from "chai";
 import chaiHttp from "chai-http";
 import app from "../../index.js";
+import { EndPaginationItem } from "./utils.js";
 let should = chai.should();
 
 chai.use(chaiHttp);
@@ -51,16 +52,7 @@ const EndResComicItem = (done: any) => {
       // expect(i).to.have.property('name');
     });
     // res.body.data.every((i: any) => expect(i).to.have.property('name').with.key('a'))
-    res.body.should.have.property("pagination");
-    res.body.pagination.should.have
-      .property("max")
-      .with.be.a("number")
-      .to.greaterThanOrEqual(1);
-    res.body.pagination.should.have
-      .property("page")
-      .with.be.a("number")
-      .to.equal(2);
-    res.body.should.have.property("success").to.equal(true);
+
     done();
   };
 };
@@ -78,25 +70,25 @@ describe("Comic list", () => {
     it("it should GET all the comic", (done) => {
       chai
         .request(app)
-        .get("/api/v1/recently?page=2")
+        .get("/api/v1/recently?page=3")
         .end(EndResComicItem(done));
     });
-    // it('it should have pagination', (done) => {
-    //   chai.request(app)
-    //     .get('/api/v1/recently')
-    //     .end((err, res) => {
-    //       res.should.have.status(200);
-    //       res.body.should.be.a('object');
-    //       res.body.should.have.property('data');
-    //       done();
-    //     })
-    // })
+    it("it should have pagination with page = 2", (done) => {
+      chai
+        .request(app)
+        .get("/api/v1/recently?page=2")
+        .end(EndPaginationItem(done));
+    });
   });
 
   //
   describe("/GET hot", () => {
     it("it should GET all the comic", (done) => {
-      chai.request(app).get("/api/v1/hot?page=2").end(EndResComicItem(done));
+      chai.request(app).get("/api/v1/hot?page=3").end(EndResComicItem(done));
+    });
+
+    it("it should have pagination with page = 2", (done) => {
+      chai.request(app).get("/api/v1/hot?page=2").end(EndPaginationItem(done));
     });
   });
 
@@ -105,8 +97,14 @@ describe("Comic list", () => {
     it("it should GET all the comic", (done) => {
       chai
         .request(app)
-        .get("/api/v1/find?genders=1&page=2")
+        .get("/api/v1/find?genders=1&page=3")
         .end(EndResComicItem(done));
+    });
+    it("it should have pagination with page = 2", (done) => {
+      chai
+        .request(app)
+        .get("/api/v1/find?genders=1&page=2")
+        .end(EndPaginationItem(done));
     });
   });
 
@@ -115,8 +113,14 @@ describe("Comic list", () => {
     it("it should GET all the comic", (done) => {
       chai
         .request(app)
-        .get("/api/v1/find-by-name?name=one&page=2")
+        .get("/api/v1/find-by-name?name=one&page=3")
         .end(EndResComicItem(done));
+    });
+    it("it should have pagination with page = 2", (done) => {
+      chai
+        .request(app)
+        .get("/api/v1/find-by-name?name=one&page=2")
+        .end(EndPaginationItem(done));
     });
   });
 

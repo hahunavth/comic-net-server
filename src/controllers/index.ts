@@ -139,13 +139,15 @@ class Controller {
       console.log(page);
       const result = await Model.getComicComment(path, page);
       return res.status(200).json({
-        data: result?.comment?.res,
+        success: true,
         pagination: {
           max: result?.pager?.pageInfo?.max,
           page: result?.pager?.pageInfo?.current,
         },
         // FIXME: COUNT = NULL
         count: result?.pager?.count,
+
+        data: result?.comment?.res,
       });
     } catch (error) {
       next(error);
