@@ -32,7 +32,24 @@ describe("Comment", () => {
           res.should.have.status(200);
           res.body.should.be.a("object");
           res.body.should.have.property("data").with.be.a("array");
-
+          res.body.data.every((i: any) => {
+            expect(i).to.have.property("id").with.be.a("string");
+            expect(i).to.have.property("avatarUrl").with.be.a("string");
+            expect(i).to.have.property("username").with.be.a("string");
+            expect(i).to.have.property("abbr").with.be.a("string");
+            expect(i).to.have.property("datednf").with.be.a("string");
+            expect(i).to.have.property("content").with.be.a("string");
+            expect(i).to.have.property("chapterName").with.be.a("string");
+            expect(i).to.have.property("reply").with.be.a("array");
+            i.reply.every((k: any) => {
+              expect(k).to.have.property("id").with.be.a("string");
+              expect(k).to.have.property("avatarUrl").with.be.a("string");
+              expect(k).to.have.property("username").with.be.a("string");
+              expect(k).to.have.property("abbr").with.be.a("string");
+              expect(k).to.have.property("datednf").with.be.a("string");
+              expect(k).to.have.property("content").with.be.a("string");
+            });
+          });
           done();
         });
     });

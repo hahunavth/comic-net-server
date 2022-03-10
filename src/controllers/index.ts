@@ -201,17 +201,31 @@ class Controller {
 
       if (typeof name === "string") {
         const result = await Model.getComicByName(name, page);
-        return res.status(200).json({
-          success: true,
-          pagination: {
-            pagination,
-            page,
-            limit,
-            offset,
-            ...result?.pagination,
-          },
-          data: result?.list,
-        });
+        if (result?.list?.length > 0)
+          return res.status(200).json({
+            success: true,
+            pagination: {
+              pagination,
+              page,
+              limit,
+              offset,
+              ...result?.pagination,
+            },
+            data: result?.list,
+          });
+        else {
+          const newName = name.replace(/\%20/g, "+");
+          const result2 = await Model.suggestSearch(newName);
+          return res.status(200).json({
+            success: true,
+            pagination: {
+              pagination: false,
+              page: 1,
+              max: 1,
+            },
+            data: result2,
+          });
+        }
       }
       res.status(400).json({
         message: "not found",

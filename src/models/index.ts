@@ -6,7 +6,12 @@ import path from "path";
 import { FindComicProps, GENRES_LIST } from "../../constants.js";
 import { API_URL } from "../../config.env.js";
 import { distance2Date } from "../utils/time.js";
-import { queryGen_T, resComicDetail_T, resComicItem_T } from "../utils/api.js";
+import {
+  queryGen_T,
+  resComicDetail_T,
+  resComicItem_T,
+  resComicSuggestSearchT,
+} from "../utils/api.js";
 import { getDocumentByUrl, parseListGen3 } from "../utils/parser.js";
 import RandomUseragent from "random-useragent";
 import { getPathFromUrl } from "../utils/index.js";
@@ -250,7 +255,55 @@ class Model {
     const result = await getComicCard(data);
     return result;
   }
+
+  static async suggestSearch(name: string, page?: number) {
+    const { data } = await instance.get(
+      `/Comic/Services/SuggestSearch.ashx?q=${name}`
+    );
+
+    const result = await parseListGen(
+      data,
+      {
+        list: {
+          selectorAll: "ul>li",
+          attribute: "",
+          callback: (e) => {
+            console.log(e);
+            return e;
+          },
+        },
+      },
+      (e: Element, attr: string, customSelector) => {
+        let posterUrl = e.querySelector("img")?.getAttribute("src");
+        if (posterUrl?.startsWith("//"))
+          posterUrl = posterUrl.replace("//", "https://");
+        return {
+          path: getPathFromUrl(e.querySelector("a")?.getAttribute("href")),
+          posterUrl,
+          name: e.querySelector("h3")?.textContent?.trim(),
+          lastedChapter:
+            e.querySelector("h4>i:first-child")?.textContent?.trim() || "",
+          detail:
+            e
+              .querySelector("h4>i:nth-child(2)")
+              ?.childNodes[0].nodeValue?.trim() || "",
+          author:
+            e.querySelector("h4>i:nth-child(2)>b")?.textContent?.trim() ||
+            "Đang cập nhật",
+          kind:
+            e
+              .querySelector("h4>i:nth-child(3)")
+              ?.childNodes[0].nodeValue?.split(", ") || [],
+        };
+      }
+    );
+    // console.log(result);
+    // console.log(result?.list?.length);
+    return result.list as resComicSuggestSearchT;
+  }
 }
+
+// Model.suggestSearch("one");
 
 /**
  * Helper function

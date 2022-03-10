@@ -80,3 +80,13 @@ export type resChapterDetail_T = {
   images: string[];
   chapterList: any[];
 };
+
+export type resComicSuggestSearchT = {
+  path: string;
+  posterUrl: string;
+  name: string;
+  lastedChapter: string;
+  detail: string;
+  author: string;
+  kind: string[];
+};
