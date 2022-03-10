@@ -40,7 +40,7 @@ class Controller {
         pagination: {
           page: result?.pagination.page || page,
           limit,
-          max: result?.pagination?.max || -1
+          max: result?.pagination?.max || -1,
         },
         data: result?.list || [],
       });
@@ -102,7 +102,7 @@ class Controller {
         pagination: {
           page: result?.pagination.page || page,
           limit,
-          max: result?.pagination?.max || -1
+          max: result?.pagination?.max || -1,
         },
         data: result?.list,
       });
@@ -135,9 +135,17 @@ class Controller {
   ) {
     try {
       const path = req.body?.path || req.params.id;
-      const result = await Model.getComicComment(path);
+      const { page, paginate } = res.locals;
+      console.log(page);
+      const result = await Model.getComicComment(path, page);
       return res.status(200).json({
-        data: result,
+        data: result?.comment?.res,
+        pagination: {
+          max: result?.pager?.pageInfo?.max,
+          page: result?.pager?.pageInfo?.current,
+        },
+        // FIXME: COUNT = NULL
+        count: result?.pager?.count,
       });
     } catch (error) {
       next(error);
@@ -159,12 +167,11 @@ class Controller {
         status: params.status,
         page,
       });
-      return res.status(200)
-      .json({
+      return res.status(200).json({
         pagination: result?.pagination,
         data: result?.list || [],
-        success: true
-       });
+        success: true,
+      });
     } catch (error) {
       next(error);
     }
@@ -199,7 +206,7 @@ class Controller {
             page,
             limit,
             offset,
-            ...result?.pagination
+            ...result?.pagination,
           },
           data: result?.list,
         });

@@ -229,12 +229,12 @@ class Model {
     return result;
   }
 
-  static async getComicComment(path: string) {
+  static async getComicComment(path: string, page: number = 1) {
     try {
-      const comicId = getComicIdBySlug(path);
-      console.log(comicId);
+      const comicId = getComicIdBySlug(`${path}`);
+      console.log(page);
 
-      return await getCommentInChapterPage(comicId);
+      return await getCommentInChapterPage(comicId, page);
     } catch (error: unknown) {
       if (error instanceof Error) console.log(error.message);
       else console.log(error);
@@ -267,13 +267,11 @@ function getChapterIdBySlug(slug: string) {
 
 async function getCommentInChapterPage(
   comicId: string | number,
-  page?: number
+  page: number = 1
 ) {
-  console.log("🚀 ~ file: index.ts ~ line 227 ~ comicId", comicId);
+  // console.log("🚀 ~ file: index.ts ~ line 227 ~ comicId", comicId);
   const { data } = await instance.get(
-    `${API_URL}/Comic/Services/CommentService.asmx/GetList?comicId=${comicId}&orderBy=0&chapterId=0&parentId=0&pageNumber=${
-      page || 1
-    }`
+    `${API_URL}/Comic/Services/CommentService.asmx/GetList?comicId=${comicId}&orderBy=0&chapterId=0&parentId=0&pageNumber=${page}`
   );
 
   const pager = parseListGen(
@@ -294,6 +292,15 @@ async function getCommentInChapterPage(
             max: info[1],
           };
         },
+      },
+      // FIXME: count = null
+      count: {
+        selector: ".nav-tabs",
+        attribute: "",
+        // callback: (r: string) => {
+        //   console.log(r);
+        //   return r;
+        // },
       },
     },
     (e: Element, attr: string) => {

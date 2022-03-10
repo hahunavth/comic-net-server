@@ -139,7 +139,7 @@ Router.get("/truyen-tranh/:id", Controller.getComicPage);
  *            schema:
  *              type: object
  */
-Router.get("/comic-comment/:id", Controller.getComicComment);
+Router.get("/comic-comment/:id", paginate, Controller.getComicComment);
 
 /**
  * @swagger
