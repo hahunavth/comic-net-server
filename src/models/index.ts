@@ -338,9 +338,7 @@ async function getCommentInChapterPage(
           content: e.querySelector(".summary")?.textContent,
 
           reply: [...e.querySelectorAll(".jcmt > li:not([class])")].map((e) => {
-            let avatarUrl = e
-              ?.querySelector(".author > img")
-              ?.getAttribute("src");
+            let avatarUrl = e?.querySelector("img")?.getAttribute("src");
             if (avatarUrl?.startsWith("//")) avatarUrl = "https:" + avatarUrl;
 
             return {
