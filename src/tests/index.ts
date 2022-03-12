@@ -25,8 +25,8 @@ const EndResComicItem = (done: any) => {
     res.body.data.every((i: any) => {
       expect(i).to.have.property("name").with.be.a("string");
       expect(i).to.have.property("status").with.be.a("string");
-      expect(i).to.have.property("views").with.be.a("string");
-      expect(i).to.have.property("follows").with.be.a("string");
+      expect(i).to.have.property("views").with.be.a("number");
+      expect(i).to.have.property("follows").with.be.a("number");
       expect(i).to.have.property("updatedDistance").with.be.a("string");
       expect(i).to.have.property("updatedAt").with.be.a("string");
       expect(i).to.have.property("posterUrl").with.be.a("string");

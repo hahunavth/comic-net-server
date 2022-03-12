@@ -201,11 +201,12 @@ class Controller {
 
       if (typeof name === "string") {
         const result = await Model.getComicByName(name, page);
-        if (result?.list?.length > 0)
+        if (result?.list?.length && result?.list?.length > 0)
           return res.status(200).json({
             success: true,
             pagination: {
               pagination,
+              // @ts-ignore
               page,
               limit,
               offset,

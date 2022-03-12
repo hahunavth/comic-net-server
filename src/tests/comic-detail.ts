@@ -19,9 +19,9 @@ const ItComicDetail = (done: any) => {
       res.body.should.have.property("author").with.be.a("string");
       res.body.should.have.property("posterUrl").with.be.a("string");
       res.body.should.have.property("status").with.be.a("string");
-      res.body.should.have.property("rate").with.be.a("string");
-      res.body.should.have.property("views").with.be.a("string");
-      res.body.should.have.property("follows").with.be.a("string");
+      res.body.should.have.property("rate").with.be.a("number");
+      res.body.should.have.property("views").with.be.a("number");
+      res.body.should.have.property("follows").with.be.a("number");
       res.body.should.have.property("detail").with.be.a("string");
       res.body.should.have.property("chapters").with.be.a("array");
       res.body.should.have
@@ -34,8 +34,8 @@ const ItComicDetail = (done: any) => {
         expect(i).to.have.property("updatedAt").with.be.a("string");
         expect(i).to.have.property("url").with.be.a("string");
         expect(i).to.have.property("updatedDistance").with.be.a("string");
-        expect(i).to.have.property("updatedView").with.be.a("string");
-        expect(i).to.have.property("data-id").with.be.a("string");
+        expect(i).to.have.property("updatedView").with.be.a("number");
+        expect(i).to.have.property("data-id").with.be.a("number");
         // console.log(i.path);
         expect(i)
           .to.have.property("path")

@@ -49,3 +49,6 @@ export function getChapterSlug(path: string) {
 export function getPathFromUrl(url?: string | null) {
   return url?.replace(/^.*\/\/[^\/]+/, "");
 }
+
+export const string2Number = (e: string | undefined) =>
+  Number.parseInt(e?.replace(/\./g, "").replace(/,/g, ".") || "", 10);

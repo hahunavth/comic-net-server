@@ -7,6 +7,7 @@ import t from "io-ts";
 const PaginateRT = t.type({
   page: t.string,
   limit: t.string,
+  max: t.string,
 });
 
 type PaginateT = t.TypeOf<typeof PaginateRT>;

@@ -65,3 +65,12 @@ export declare type resChapterDetail_T = {
     images: string[];
     chapterList: any[];
 };
+export declare type resComicSuggestSearchT = {
+    path: string;
+    posterUrl: string;
+    name: string;
+    lastedChapter: string;
+    detail: string;
+    author: string;
+    kind: string[];
+};

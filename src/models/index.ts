@@ -14,7 +14,7 @@ import {
 } from "../utils/api.js";
 import { getDocumentByUrl, parseListGen3 } from "../utils/parser.js";
 import RandomUseragent from "random-useragent";
-import { getPathFromUrl } from "../utils/index.js";
+import { getPathFromUrl, string2Number } from "../utils/index.js";
 
 // STUB: Naming rules
 // ...Url: include domain: "https://......./a/b/c"
@@ -82,10 +82,23 @@ class Model {
           info: {
             selector: ".list-info > li:last-child > .col-xs-8",
             attribute: "",
+            callback: string2Number,
           },
-          rate: { selector: ".mrt5  > span > span:first-child", attribute: "" },
-          views: { selector: ".mrt5  > span > span:last-child", attribute: "" },
-          follows: { selector: ".follow > span > b", attribute: "" },
+          rate: {
+            selector: ".mrt5  > span > span:first-child",
+            attribute: "",
+            callback: (e: string) => Number.parseFloat(e),
+          },
+          views: {
+            selector: ".mrt5  > span > span:last-child",
+            attribute: "",
+            callback: string2Number,
+          },
+          follows: {
+            selector: ".follow > span > b",
+            attribute: "",
+            callback: string2Number,
+          },
           detail: { selector: ".detail-content > p", attribute: "" },
           chapters: {
             selectorAll: "nav > ul > .row > .chapter > a",
@@ -94,6 +107,7 @@ class Model {
           chapterDataIds: {
             selectorAll: "nav > ul > .row > .chapter > a",
             attribute: "data-id",
+            callback: (l) => l.map(string2Number),
           },
           chapterUrls: {
             selectorAll: "nav > ul > .row > .chapter > a",
@@ -120,6 +134,7 @@ class Model {
           chapterViews: {
             selectorAll: "li > .col-xs-3.text-center.small",
             attribute: "",
+            callback: (l) => l.map(string2Number),
           },
         },
         (e: Element, attr: string) => {
@@ -466,7 +481,11 @@ async function getTopList(data: string) {
           name: e.querySelector("p > a")?.textContent,
           path: e.querySelector("p > a")?.getAttribute("href"),
         },
-        views: e.querySelector("p > span")?.textContent?.trim(),
+        views: Number.parseInt(
+          e.querySelector("p > span")?.textContent?.trim().replace(/\./g, "") ||
+            "",
+          10
+        ),
       };
     }
   );
@@ -599,10 +618,15 @@ async function getComicCard(data: string) {
       }
     );
 
-    return {
-      list: list ? list[0] : ([] as resComicItem_T[]),
+    const result = {
+      list: ((list ? list[0] : []) as resComicItem_T[]).map((item) => ({
+        ...item,
+        views: Number.parseInt(item?.views?.replace(/\./g, "") || "", 10),
+        follows: Number.parseInt(item?.follows?.replace(/\./g, "") || "", 10),
+      })),
       pagination: pager.pagination as Paginate,
     };
+    return result;
   } catch (error: unknown) {
     if (error instanceof Error) console.log(error.message);
     else console.log(error);

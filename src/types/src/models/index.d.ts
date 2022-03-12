@@ -1,7 +1,8 @@
 import { FindComicProps } from "../../constants.js";
+import { resComicSuggestSearchT } from "../utils/api.js";
 /**
-  * Fetch data model
-  */
+ * Fetch data model
+ */
 declare class Model {
     static RecentUpdate(page: number): Promise<{
         list: any;
@@ -32,7 +33,7 @@ declare class Model {
         pagination: Paginate;
     } | undefined>;
     static getChapterPage(path: string): Promise<any>;
-    static getComicComment(path: string): Promise<{
+    static getComicComment(path: string, page?: number): Promise<{
         comment: any;
         pager: any;
     } | undefined>;
@@ -40,6 +41,7 @@ declare class Model {
         list: any;
         pagination: Paginate;
     } | undefined>;
+    static suggestSearch(name: string, page?: number): Promise<resComicSuggestSearchT>;
 }
 declare type Paginate = {
     page: number | string;
