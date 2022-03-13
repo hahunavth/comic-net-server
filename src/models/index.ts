@@ -574,6 +574,8 @@ async function getComicCard(data: string) {
             };
           });
 
+          result.description = e.querySelector(".box_text")?.textContent;
+
           return result;
         }
         if (!attr) return e.textContent || "";

@@ -30,6 +30,7 @@ const EndResComicItem = (done: any) => {
       expect(i).to.have.property("updatedDistance").with.be.a("string");
       expect(i).to.have.property("updatedAt").with.be.a("string");
       expect(i).to.have.property("posterUrl").with.be.a("string");
+      expect(i).to.have.property("description").with.be.a("string");
       expect(i)
         .to.have.property("path")
         .with.be.a("string")
