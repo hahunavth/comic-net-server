@@ -113,8 +113,8 @@ class Controller {
 
   static async getComicPage(req: Request, res: Response, next: NextFunction) {
     try {
-      // console.log("aaaaaaa");
-      // if (req.body) return res.status(400).json({});
+      const { partial } = req.query;
+
       const path = req.body?.path || req.params.id;
       console.log(path);
       const result = await Model.getComicPage(
@@ -122,6 +122,27 @@ class Controller {
           ? "/truyen-tranh/" + path
           : "/truyen-tranh/kaii-to-otome-to-kamigakushi-51987"
       );
+      //
+      if (partial === "comic") {
+        return res.status(200).json({
+          path: result?.path,
+          title: result?.title,
+          author: result?.author,
+          detail: result?.detail,
+          follows: result?.follows,
+          info: result?.info,
+          kind: result?.kind,
+          posterUrl: result?.posterUrl,
+          rate: result?.rate,
+          status: result?.status,
+          views: result?.views,
+        });
+      } else if (partial === "chapter") {
+        return res.status(200).json({
+          chapters: result?.chapters,
+        });
+      }
+      //
       return res.status(200).json(result);
     } catch (error) {
       next(error);
