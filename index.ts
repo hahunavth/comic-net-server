@@ -4,6 +4,7 @@ import cors from "cors";
 import logger from "morgan";
 import swaggerJsDoc from "swagger-jsdoc";
 import swaggerUiExpress from "swagger-ui-express";
+import compression from "compression";
 
 import errorHandler from "./src/middleware/errorHandler.js";
 import cache from "./src/middleware/cache.js";
@@ -16,11 +17,11 @@ import Task from "./src/services/update-db.js";
 const app = express();
 
 app.use(cors());
+app.use(compression());
 app.use(cache());
-if(process.env.NODE_ENV !== 'test')
-  app.use(logger("dev"));
 app.use(errorHandler);
 app.use(express.json());
+if (process.env.NODE_ENV !== "test") app.use(logger("dev"));
 
 // Swagger
 const options = {
@@ -99,8 +100,7 @@ async function main() {
 }
 
 // RUN APPLICATION IF NOT ENV IS NOT TESTING
-if(process.env.NODE_ENV !== 'test')
-  main().catch((err) => console.log(err));
+if (process.env.NODE_ENV !== "test") main().catch((err) => console.log(err));
 
 // For testing
 export default app;

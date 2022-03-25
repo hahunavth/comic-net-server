@@ -5,13 +5,51 @@ import { resComicSuggestSearchT } from "../utils/api.js";
  */
 declare class Model {
     static RecentUpdate(page: number): Promise<{
-        list: any;
+        list: {
+            views: number;
+            follows: number;
+            kind?: string[] | undefined;
+            author?: string | undefined;
+            anotherName?: string | undefined;
+            status?: string | undefined;
+            updateAt?: string | undefined;
+            updatedDistance?: string | undefined;
+            name?: string | undefined;
+            posterUrl?: string | undefined;
+            path?: string | undefined;
+            id?: string | undefined;
+            lastedChapters?: [{
+                chapterName: string;
+                chapterUrl: string;
+                updatedAt: string;
+                updatedDistance: string;
+            }] | undefined;
+        }[];
         pagination: Paginate;
     } | undefined>;
     static getTopComicMonth(): Promise<any>;
     static getHomeComment(): Promise<any>;
     static getHotPage(page?: number): Promise<{
-        list: any;
+        list: {
+            views: number;
+            follows: number;
+            kind?: string[] | undefined;
+            author?: string | undefined;
+            anotherName?: string | undefined;
+            status?: string | undefined;
+            updateAt?: string | undefined;
+            updatedDistance?: string | undefined;
+            name?: string | undefined;
+            posterUrl?: string | undefined;
+            path?: string | undefined;
+            id?: string | undefined;
+            lastedChapters?: [{
+                chapterName: string;
+                chapterUrl: string;
+                updatedAt: string;
+                updatedDistance: string;
+            }] | undefined;
+        }[];
         pagination: Paginate;
     } | undefined>;
     static getComicPage(path: string): Promise<{
@@ -29,7 +67,26 @@ declare class Model {
         chapters: any;
     } | undefined>;
     static FindComic(param: FindComicProps): Promise<{
-        list: any;
+        list: {
+            views: number;
+            follows: number;
+            kind?: string[] | undefined;
+            author?: string | undefined;
+            anotherName?: string | undefined;
+            status?: string | undefined;
+            updateAt?: string | undefined;
+            updatedDistance?: string | undefined;
+            name?: string | undefined;
+            posterUrl?: string | undefined;
+            path?: string | undefined;
+            id?: string | undefined;
+            lastedChapters?: [{
+                chapterName: string;
+                chapterUrl: string;
+                updatedAt: string;
+                updatedDistance: string;
+            }] | undefined;
+        }[];
         pagination: Paginate;
     } | undefined>;
     static getChapterPage(path: string): Promise<any>;
@@ -38,7 +95,26 @@ declare class Model {
         pager: any;
     } | undefined>;
     static getComicByName(name: string, page: number): Promise<{
-        list: any;
+        list: {
+            views: number;
+            follows: number;
+            kind?: string[] | undefined;
+            author?: string | undefined;
+            anotherName?: string | undefined;
+            status?: string | undefined;
+            updateAt?: string | undefined;
+            updatedDistance?: string | undefined;
+            name?: string | undefined;
+            posterUrl?: string | undefined;
+            path?: string | undefined;
+            id?: string | undefined;
+            lastedChapters?: [{
+                chapterName: string;
+                chapterUrl: string;
+                updatedAt: string;
+                updatedDistance: string;
+            }] | undefined;
+        }[];
         pagination: Paginate;
     } | undefined>;
     static suggestSearch(name: string, page?: number): Promise<resComicSuggestSearchT>;

@@ -10,3 +10,4 @@ export declare function getChapterSlug(path: string): string | null;
  * @example: http://abc.domain.com/slug/slug2 -> /slug/slug2
  */
 export declare function getPathFromUrl(url?: string | null): string | undefined;
+export declare const string2Number: (e: string | undefined) => number;

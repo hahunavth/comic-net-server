@@ -8,6 +8,10 @@
 ![image info](./Screenshot2.png)
 
 ### Install
+
+#### Setup
+  - Rename .env.example to .env and change DB_PASSWORD
+
 ```bash
 git clone https://github.com/hahunavth/comic-net-server/
 cd comic-net-server/
