@@ -200,6 +200,30 @@ class Controller {
     }
   }
 
+  static async findComicByGenresName(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { genresName } = req.query;
+      const { pagination, page, limit, offset } = res.locals;
+
+      const result = await Model.getComicByGenresName(
+        genresName as string,
+        page || "1"
+      );
+
+      return res.status(200).json({
+        pagination: result?.pagination,
+        data: result?.list || [],
+        success: true,
+      });
+    } catch (e) {
+      next(e);
+    }
+  }
+
   // TODO: PAGINATE RESPONSE
   static async getChapterPage(req: Request, res: Response, next: NextFunction) {
     try {

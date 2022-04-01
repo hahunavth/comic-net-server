@@ -206,6 +206,37 @@ Router.get("/find/", paginate, Controller.findComicPage);
 
 /**
  * @swagger
+ * /findByGenresName:
+ *   get:
+ *     summary: Retrieve comic details
+ *     description: FindByGenresName comic by genres, max_chapter, ...
+ *     parameters:
+ *       - in: query
+ *         name: genresName
+ *         required: true
+ *         description: endpoint path
+ *         schema:
+ *           type: string
+ *           example: manga-112
+ *       - in: query
+ *         name: page
+ *         required: false
+ *         description: endpoint path
+ *         schema:
+ *           type: string
+ *           example: 1
+ *     responses:
+ *       200:
+ *         description: A list of comics.
+ *         content:
+ *           application/json:
+ *            schema:
+ *              type: object
+ */
+Router.get("/findByGenresName/", paginate, Controller.findComicByGenresName);
+
+/**
+ * @swagger
  * /find-by-name:
  *   get:
  *     summary: Retrieve comic details

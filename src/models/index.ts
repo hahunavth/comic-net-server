@@ -191,6 +191,18 @@ class Model {
     }
   }
 
+  static async getComicByGenresName(kindName: string, page: string) {
+    try {
+      const { data } = await instance.get(
+        `/tim-truyen/${kindName}?page=${page}`
+      );
+      return await getComicCard(data);
+    } catch (error: unknown) {
+      if (error instanceof Error) console.log(error.message);
+      else console.log(error);
+    }
+  }
+
   static async getChapterPage(path: string) {
     const { data } = await instance.get(`${path}`);
     const result = parseListGen(
