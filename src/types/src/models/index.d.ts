@@ -89,6 +89,29 @@ declare class Model {
         }[];
         pagination: Paginate;
     } | undefined>;
+    static getComicByGenresName(kindName: string, page: string): Promise<{
+        list: {
+            views: number;
+            follows: number;
+            kind?: string[] | undefined;
+            author?: string | undefined;
+            anotherName?: string | undefined;
+            status?: string | undefined;
+            updateAt?: string | undefined;
+            updatedDistance?: string | undefined;
+            name?: string | undefined;
+            posterUrl?: string | undefined;
+            path?: string | undefined;
+            id?: string | undefined;
+            lastedChapters?: [{
+                chapterName: string;
+                chapterUrl: string;
+                updatedAt: string;
+                updatedDistance: string;
+            }] | undefined;
+        }[];
+        pagination: Paginate;
+    } | undefined>;
     static getChapterPage(path: string): Promise<any>;
     static getComicComment(path: string, page?: number): Promise<{
         comment: any;

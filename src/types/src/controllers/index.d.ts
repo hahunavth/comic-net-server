@@ -8,6 +8,7 @@ declare class Controller {
     static getComicPage(req: Request, res: Response, next: NextFunction): Promise<Response<any, Record<string, any>> | undefined>;
     static getComicComment(req: Request, res: Response, next: NextFunction): Promise<Response<any, Record<string, any>> | undefined>;
     static findComicPage(req: Request, res: Response, next: NextFunction): Promise<Response<any, Record<string, any>> | undefined>;
+    static findComicByGenresName(req: Request, res: Response, next: NextFunction): Promise<Response<any, Record<string, any>> | undefined>;
     static getChapterPage(req: Request, res: Response, next: NextFunction): Promise<void>;
     static findComicByName(req: Request, res: Response, next: NextFunction): Promise<Response<any, Record<string, any>> | undefined>;
     static corsAnywhere(req: Request, res: Response): Promise<void>;

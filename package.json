@@ -1,7 +1,7 @@
 {
   "name": "comic-cors-api",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "dist/index.js",
   "author": "hahunavth",
   "license": "MIT",
   "type": "module",
